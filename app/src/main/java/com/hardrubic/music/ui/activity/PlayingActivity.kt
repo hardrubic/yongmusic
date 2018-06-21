@@ -1,19 +1,22 @@
 package com.hardrubic.music.ui.activity
 
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.widget.SeekBar
 import android.widget.Toast
+import com.hardrubic.music.Constant
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.MusicControl
 import com.hardrubic.music.biz.command.*
-import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayModelHelper
 import com.hardrubic.music.biz.listener.MusicStateListener
 import com.hardrubic.music.biz.vm.PlayingViewModel
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.fragment.PlayListFragment
+import com.hardrubic.music.ui.fragment.PlayingMusicMoreDialogFragment
 import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
 import com.hardrubic.music.util.FormatUtil
 import kotlinx.android.synthetic.main.activity_playing.*
@@ -21,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_playing.*
 class PlayingActivity : BaseActivity(), MusicStateListener {
 
     private var movingProgress = false
+    private var love: Boolean? = null
 
     private val viewModel: PlayingViewModel by lazy {
         ViewModelProviders.of(this).get(PlayingViewModel::class.java)
@@ -42,6 +46,26 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         StatusBarColor.setStatusBarColor(this, ContextCompat.getColor(this, R.color.black))
+
+        iv_love.setOnClickListener {
+            if (viewModel.playingMusic != null) {
+                val playingMusicId = viewModel.playingMusic!!.musicId
+                val newLove = !love!!
+                updateLoveState(newLove)
+                viewModel.changeMusicLove(playingMusicId, newLove)
+            }
+        }
+        iv_download.setOnClickListener {
+
+        }
+        iv_more.setOnClickListener {
+            if (viewModel.existPlayingMusic()) {
+                val fragment = PlayingMusicMoreDialogFragment()
+                fragment.show(supportFragmentManager, PlayingMusicMoreDialogFragment.TAG)
+            } else {
+                Toast.makeText(this, R.string.hint_no_playing_music, Toast.LENGTH_SHORT).show()
+            }
+        }
 
         iv_previous.setOnClickListener {
             viewModel.previousMusic()
@@ -104,10 +128,17 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
     }
 
     override fun updateCurrentMusic(music: Music) {
+        viewModel.playingMusic = music
+
         supportActionBar!!.title = music.name
         supportActionBar!!.subtitle = music.artist
         sb_progress.max = music.duration
         tv_duration.text = FormatUtil.formatDuration(music.duration)
+
+        if (love == null) {
+            love = viewModel.isMusicLove(music.musicId)
+            updateLoveState(love!!)
+        }
     }
 
     override fun updatePlayingState(flag: Boolean) {
@@ -118,4 +149,35 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
         }
     }
 
+    private fun updateLoveState(love: Boolean) {
+        if (love) {
+            iv_love.setImageResource(R.mipmap.ic_love_red)
+        } else {
+            iv_love.setImageResource(R.mipmap.ic_love_white)
+        }
+    }
+
+    private fun addMusic2Collection(collectionId: Long) {
+        val musicId = viewModel.playingMusic?.musicId ?: return
+        viewModel.addOrDelete2Collection(musicId, collectionId, true)
+
+        val collection = viewModel.queryCollection(collectionId)
+        collection?.let {
+            val msg = getString(R.string.hint_add_music_to_collection_success, collection.name)
+            Snackbar.make(sb_progress, msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            Constant.RequestCode.SELECT_COLLECTION -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val collectionId = data?.getLongExtra(Constant.Param.COLLECTION_ID, -1) ?: return
+                    addMusic2Collection(collectionId)
+                }
+            }
+        }
+    }
 }

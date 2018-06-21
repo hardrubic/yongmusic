@@ -8,9 +8,6 @@
     <string name="search">搜索</string>
     <string name="my">我的</string>
     <string name="discover">发现</string>
-    <string name="local_music">本地音乐</string>
-    <string name="recent_play">最近播放</string>
-    <string name="loading">加载中，请稍后</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="hint">提示</string>
@@ -18,14 +15,32 @@
     <string name="delete">删除</string>
     <string name="about">关于</string>
     <string name="exit">退出</string>
-    <string name="clear_cache">清空缓存</string>
-    <string name="night">夜间模式</string>
-    <string name="schedule_close">定时关闭</string>
+    <string name="collection">歌单</string>
+    <string name="edit">编辑</string>
+    <string name="name">名称</string>
 
+    <string name="num">(%1$d)</string>
     <string name="hint_need_permission">需要获取权限</string>
     <string name="play_all">播放全部</string>
-    <string name="music_num">(共%1$d首)</string>
+    <string name="music_num">%1$d首</string>
     <string name="play_by_list">列表循环</string>
     <string name="play_by_random">随机播放</string>
     <string name="play_by_single">单曲循环</string>
+    <string name="clear_cache">清空缓存</string>
+    <string name="night">夜间模式</string>
+    <string name="schedule_close">定时关闭</string>
+    <string name="local_music">本地音乐</string>
+    <string name="recent_play">最近播放</string>
+    <string name="loading">加载中，请稍后</string>
+    <string name="my_music_collect">我的歌单</string>
+    <string name="my_love">我喜欢</string>
+    <string name="add_collection">新建歌单</string>
+    <string name="save_to_collection">收藏到歌单</string>
+    <string name="select_collection">选择歌单</string>
+    <string name="edit_collection">编辑歌单</string>
+    <string name="change_cover">更换封面</string>
+
+    <string name="hint_add_music_to_collection_success">成功添加音乐到:%1$s</string>
+    <string name="hint_collection_name">请输入歌单标题</string>
+    <string name="hint_no_playing_music">当前没有播放中音乐</string>
 </resources>

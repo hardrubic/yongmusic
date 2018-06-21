@@ -112,6 +112,7 @@ open class BaseActivity : AppCompatActivity() {
                     LogUtil.d("broadcast receive $action:$flag")
                     weakReference.get()?.notifyPlayingState(flag)
                 }
+                //todo add recent
             }
         }
     }

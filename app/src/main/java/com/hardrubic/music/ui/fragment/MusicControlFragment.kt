@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.MusicControl
 import com.hardrubic.music.biz.command.ApplyCurrentMusicCommand
 import com.hardrubic.music.biz.command.ApplyPlayStateCommand
 import com.hardrubic.music.biz.command.PlayOrPauseCommand

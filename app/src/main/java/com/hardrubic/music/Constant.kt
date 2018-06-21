@@ -1,12 +1,25 @@
 package com.hardrubic.music
 
 class Constant {
+    companion object {
+        val LOVE_COLLECTION_ID = 0L
+    }
+
     object Param {
         const val CURRENT_MUSIC = "CURRENT_MUSIC"
         const val PLAY_MODEL = "PLAY_MODEL"
         const val PROGRESS = "PROGRESS"
         const val FLAG = "FLAG"
         const val LIST = "LIST"
+        const val COLLECTION_ID = "COLLECTION_ID"
+        const val MUSIC_ID = "MUSIC_ID"
+    }
+
+    object RequestCode {
+        const val SELECT_COLLECTION = 100
+    }
+
+    object ResultCode {
     }
 
     object BroadcastAction {

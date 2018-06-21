@@ -37,6 +37,15 @@ object PlayListHelper {
         return true
     }
 
+    fun replace(music: Music) {
+        replace(listOf(music))
+    }
+
+    fun replace(musics: List<Music>) {
+        val ids = musics.map { it.musicId }
+        PreferencesUtil.instance.putString(Constant.SpKey.PLAY_LIST, TextUtils.join(",", ids))
+    }
+
     fun delete(music: Music) {
         val existIdsStr: String = PreferencesUtil.instance.getString(Constant.SpKey.PLAY_LIST) ?: return
         val existIds = existIdsStr.split(",").toMutableList()
