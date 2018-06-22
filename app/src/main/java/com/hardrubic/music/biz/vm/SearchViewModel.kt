@@ -8,8 +8,11 @@ import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.command.UpdatePlayListCommand
 import com.hardrubic.music.biz.component.DaggerSearchViewModelComponent
 import com.hardrubic.music.biz.helper.PlayListHelper
+import com.hardrubic.music.biz.repository.ArtistRepository
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
+import com.hardrubic.music.db.dataobject.Album
+import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.network.HttpService
 import com.hardrubic.music.util.FileUtil
@@ -28,28 +31,48 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     lateinit var musicRepository: MusicRepository
     @Inject
     lateinit var recentRepository: RecentRepository
+    @Inject
+    lateinit var artistRepository: ArtistRepository
 
-    val searchData = MutableLiveData<List<Music>>()
+    val musicData = MutableLiveData<List<Music>>()
+    val artistData = MutableLiveData<List<Artist>>()
+    val albumData = MutableLiveData<List<Album>>()
 
     init {
         DaggerSearchViewModelComponent.builder().build().inject(this)
     }
 
-    fun searchMusic(searchText: String) {
-        HttpService.instance.applySearchMusic(searchText)
-                .subscribe(object : SingleObserver<List<Music>> {
-                    override fun onSubscribe(d: Disposable) {
-                    }
+    fun searchMusic(searchText: String, errorConsumer: Consumer<Throwable>) {
+        if (searchText.isEmpty()) {
+            musicData.value = Collections.emptyList()
+        } else {
+            HttpService.instance.applySearchMusic(searchText)
+                    .subscribe(Consumer<List<Music>> {
+                        musicData.value = it
+                    }, errorConsumer)
+        }
+    }
 
-                    override fun onSuccess(musics: List<Music>) {
-                        searchData.value = musics
-                    }
+    fun searchArtist(searchText: String, errorConsumer: Consumer<Throwable>) {
+        if (searchText.isEmpty()) {
+            artistData.value = Collections.emptyList()
+        } else {
+            HttpService.instance.applySearchArtist(searchText)
+                    .subscribe(Consumer<List<Artist>> {
+                        artistData.value = it
+                    }, errorConsumer)
+        }
+    }
 
-                    override fun onError(e: Throwable) {
-                        searchData.value = Collections.emptyList()
-                        e.printStackTrace()
-                    }
-                })
+    fun searchAlbum(searchText: String, errorConsumer: Consumer<Throwable>) {
+        if (searchText.isEmpty()) {
+            albumData.value = Collections.emptyList()
+        } else {
+            HttpService.instance.applySearchAlbum(searchText)
+                    .subscribe(Consumer<List<Album>> {
+                        albumData.value = it
+                    }, errorConsumer)
+        }
     }
 
     fun applyCacheAndPlayMusic(music: Music) {
@@ -87,6 +110,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private fun finishCacheMusic(music: Music) {
         recentRepository.add(music.musicId)
         musicRepository.add(music)
+        artistRepository.add(music.artists)
         //添加到播放列表
         if (PlayListHelper.add(music)) {
             val musics = PlayListHelper.list().mapNotNull { musicRepository.queryMusic(it) }

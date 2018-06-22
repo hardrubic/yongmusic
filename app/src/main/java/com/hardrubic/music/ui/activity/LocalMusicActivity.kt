@@ -5,20 +5,18 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.vm.LocalMusicViewModel
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.adapter.MusicListAdapter
-import com.hardrubic.music.util.LoadingDialogHelper
+import com.hardrubic.music.ui.widget.view.MusicBatchHeaderView
+import com.hardrubic.music.ui.widget.view.OnMusicBatchHeaderViewListener
 import kotlinx.android.synthetic.main.activity_local_music.*
 import java.util.*
 
 class LocalMusicActivity : BaseActivity() {
 
-    private lateinit var headView: View
+    private lateinit var headView: MusicBatchHeaderView
     private lateinit var adapter: MusicListAdapter
     private val viewModel: LocalMusicViewModel by lazy {
         ViewModelProviders.of(this).get(LocalMusicViewModel::class.java)
@@ -31,7 +29,6 @@ class LocalMusicActivity : BaseActivity() {
         initData()
         initView()
 
-        LoadingDialogHelper.instance.showDefaultLoadingDialog(this)
         viewModel.searchLocalMusic()
     }
 
@@ -39,8 +36,7 @@ class LocalMusicActivity : BaseActivity() {
         viewModel.localMusicData.observe(this, Observer<List<Music>> { musics ->
             val num = musics!!.size
             adapter.setNewData(musics)
-            headView.findViewById<TextView>(R.id.tv_music_num).text = getString(R.string.music_num, num)
-            LoadingDialogHelper.instance.dismissLoadingDialog()
+            headView.refreshNum(num)
         })
     }
 
@@ -52,10 +48,11 @@ class LocalMusicActivity : BaseActivity() {
 
         showMusicControl()
 
-        //todo 封装headerView为控件
-        headView = layoutInflater.inflate(R.layout.layout_music_list_head, null)
-        headView.findViewById<LinearLayout>(R.id.ll_main).setOnClickListener {
-            viewModel.selectLocalMusic(adapter.data)
+        headView = MusicBatchHeaderView(this)
+        headView.listener = object : OnMusicBatchHeaderViewListener {
+            override fun selectAll() {
+                viewModel.selectMusic(adapter.data)
+            }
         }
 
         adapter = MusicListAdapter(Collections.emptyList())
@@ -64,7 +61,7 @@ class LocalMusicActivity : BaseActivity() {
             adapter as MusicListAdapter
             val music = adapter.getItem(position)!!
 
-            viewModel.selectLocalMusic(listOf(music))
+            viewModel.selectMusic(listOf(music))
         }
 
         rv_list.layoutManager = LinearLayoutManager(this)

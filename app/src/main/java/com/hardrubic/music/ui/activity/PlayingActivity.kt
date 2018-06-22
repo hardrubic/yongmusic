@@ -14,7 +14,6 @@ import com.hardrubic.music.biz.command.*
 import com.hardrubic.music.biz.helper.PlayModelHelper
 import com.hardrubic.music.biz.listener.MusicStateListener
 import com.hardrubic.music.biz.vm.PlayingViewModel
-import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.fragment.PlayListFragment
 import com.hardrubic.music.ui.fragment.PlayingMusicMoreDialogFragment
 import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
@@ -87,7 +86,7 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
         sb_progress.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    tv_position.text = FormatUtil.formatDuration(progress)
+                    tv_position.text = FormatUtil.formatDuration(progress.toLong())
                 }
             }
 
@@ -124,16 +123,17 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
             return
         }
         sb_progress.progress = progress
-        tv_position.text = FormatUtil.formatDuration(progress)
+        tv_position.text = FormatUtil.formatDuration(progress.toLong())
     }
 
-    override fun updateCurrentMusic(music: Music) {
+    override fun updateCurrentMusic(musicId: Long) {
+        val music = viewModel.queryMusic(musicId) ?: return
         viewModel.playingMusic = music
 
         supportActionBar!!.title = music.name
-        supportActionBar!!.subtitle = music.artist
+        supportActionBar!!.subtitle = FormatUtil.formatArtistNames(music.artistNames)
         sb_progress.max = music.duration
-        tv_duration.text = FormatUtil.formatDuration(music.duration)
+        tv_duration.text = FormatUtil.formatDuration(music.duration.toLong())
 
         if (love == null) {
             love = viewModel.isMusicLove(music.musicId)

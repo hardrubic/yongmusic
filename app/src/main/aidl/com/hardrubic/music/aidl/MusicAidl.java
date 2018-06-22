@@ -8,7 +8,6 @@ public class MusicAidl implements Parcelable {
     private Long musicId;
     private String name;
     private String path;
-    private String artist;
     private Integer duration;
     private Integer size;
 
@@ -34,14 +33,6 @@ public class MusicAidl implements Parcelable {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
     }
 
     public Integer getDuration() {
@@ -70,7 +61,6 @@ public class MusicAidl implements Parcelable {
         dest.writeValue(this.musicId);
         dest.writeString(this.name);
         dest.writeString(this.path);
-        dest.writeString(this.artist);
         dest.writeValue(this.duration);
         dest.writeValue(this.size);
     }
@@ -82,7 +72,6 @@ public class MusicAidl implements Parcelable {
         this.musicId = (Long) in.readValue(Long.class.getClassLoader());
         this.name = in.readString();
         this.path = in.readString();
-        this.artist = in.readString();
         this.duration = (Integer) in.readValue(Integer.class.getClassLoader());
         this.size = (Integer) in.readValue(Integer.class.getClassLoader());
     }

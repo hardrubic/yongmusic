@@ -14,9 +14,9 @@ import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.listener.MusicStateListener
 import com.hardrubic.music.biz.vm.MusicControlViewModel
-import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.activity.BaseActivity
 import com.hardrubic.music.ui.activity.PlayingActivity
+import com.hardrubic.music.util.FormatUtil
 import kotlinx.android.synthetic.main.fragment_music_control.*
 
 
@@ -76,9 +76,11 @@ class MusicControlFragment : BaseFragment(), MusicStateListener {
         }
     }
 
-    override fun updateCurrentMusic(music: Music) {
+    override fun updateCurrentMusic(musicId: Long) {
+        val music = viewModel.queryMusic(musicId) ?: return
+
         tv_music_name.text = music.name
-        tv_artist.text = music.artist
+        tv_artist.text = FormatUtil.formatArtistNames(music.artistNames)
         pb_progress.max = music.duration
     }
 

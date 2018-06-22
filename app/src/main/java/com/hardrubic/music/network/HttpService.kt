@@ -1,17 +1,18 @@
 package com.hardrubic.music.network
 
+import com.hardrubic.music.db.dataobject.Album
+import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
-import com.hardrubic.music.network.response.MusicResourceResponse
-import com.hardrubic.music.network.response.SearchMusicResponse
+import com.hardrubic.music.network.response.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.net.URLEncoder
 import kotlin.properties.Delegates
 
 
 class HttpService {
 
+    //todo 分页
     fun applySearchMusic(searchText: String): Single<List<Music>> {
         val param = hashMapOf<String, String>()
         param["s"] = searchText
@@ -22,18 +23,41 @@ class HttpService {
         return api.searchMusic(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode<SearchMusicResponse>())
                 .map { response: SearchMusicResponse ->
-                    response.result.songs.map {
-                        val music = Music()
-                        music.musicId = it.id
-                        music.name = it.name
-                        music.artist = it.artists?.first()?.name ?: ""
-                        music.duration = it.duration
-                        music.path = ""
-                        music.download = false
-                        music.local = false
-                        music
-                    }
+                    response.getMusics()
+                }
+    }
+
+    fun applySearchArtist(searchText: String): Single<List<Artist>> {
+        val param = hashMapOf<String, String>()
+        param["s"] = searchText
+        param["type"] = 100.toString()
+        param["limit"] = 10.toString()
+        param["offset"] = 0.toString()
+
+        return api.searchArtist(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode<SearchArtistResponse>())
+                .map { response: SearchArtistResponse ->
+                    response.getArtists()
+                }
+    }
+
+    fun applySearchAlbum(searchText: String): Single<List<Album>> {
+        val param = hashMapOf<String, String>()
+        param["s"] = searchText
+        param["type"] = 10.toString()
+        param["limit"] = 10.toString()
+        param["offset"] = 0.toString()
+
+        return api.searchAlbum(param)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode<SearchAlbumResponse>())
+                .map { response: SearchAlbumResponse ->
+                    response.getAlbums()
                 }
     }
 
@@ -46,9 +70,10 @@ class HttpService {
         return api.musicResource(param)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode<MusicResourceResponse>())
                 .map { response: MusicResourceResponse ->
-                    val result = response.data.first()
-                    Pair(result.url, result.md5)
+                    val result = response.data?.first()
+                    Pair(result?.url ?: "", result?.md5 ?: "")
                 }
 
     }

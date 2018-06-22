@@ -23,6 +23,12 @@ class MusicRepository @Inject constructor() {
         return queryBuilder.list()
     }
 
+    fun queryLocalMusic(): List<Music> {
+        val queryBuilder = musicDao.queryBuilder()
+        queryBuilder.where(MusicDao.Properties.Local.eq(true))
+        return queryBuilder.list()
+    }
+
     fun add(music: Music) {
         add(listOf(music))
     }

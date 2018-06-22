@@ -1,73 +1,60 @@
 package com.hardrubic.music.ui.activity
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.view.Menu
-import android.widget.SearchView
+import android.support.design.widget.TabLayout
+import android.support.v7.widget.AppCompatEditText
+import android.widget.Toolbar
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.vm.SearchViewModel
-import com.hardrubic.music.db.dataobject.Music
-import com.hardrubic.music.ui.adapter.MusicListAdapter
+import com.hardrubic.music.biz.listener.SearchRefreshListener
+import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
+import com.hardrubic.music.ui.fragment.search.SearchAlbumListFragment
+import com.hardrubic.music.ui.fragment.search.SearchArtistListFragment
+import com.hardrubic.music.ui.fragment.search.SearchMusicListFragment
+import com.jakewharton.rxbinding2.widget.RxTextView
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_search.*
-import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SearchActivity : BaseActivity() {
-
-    private val viewModel: SearchViewModel by lazy {
-        ViewModelProviders.of(this).get(SearchViewModel::class.java)
-    }
-    private lateinit var musicAdapter: MusicListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        initData()
         initView()
-    }
-
-    private fun initData() {
-        viewModel.searchData.observe(this, android.arch.lifecycle.Observer<List<Music>> { musics ->
-            musicAdapter.setNewData(musics)
-        })
     }
 
     private fun initView() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        val searchView = AppCompatEditText(this).apply {
+            this.hint = getString(R.string.search)
+        }
+        toolbar.addView(searchView, Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT))
+        toolbar.title = ""
 
         showMusicControl()
 
-        musicAdapter = MusicListAdapter(Collections.emptyList())
-        musicAdapter.setOnItemClickListener { adapter, view, position ->
-            val music = (adapter as MusicListAdapter).getItem(position)!!
-
-            viewModel.applyCacheAndPlayMusic(music)
+        tab.tabMode = TabLayout.MODE_FIXED
+        vp_list.adapter = MyViewPagerAdapter(supportFragmentManager).apply {
+            addFragment(SearchMusicListFragment(), getString(R.string.single_music))
+            addFragment(SearchArtistListFragment(), getString(R.string.artist))
+            addFragment(SearchAlbumListFragment(), getString(R.string.album))
         }
-        rv_list.layoutManager = LinearLayoutManager(this)
-        rv_list.adapter = musicAdapter
+        tab.setupWithViewPager(vp_list)
+
+        RxTextView.textChanges(searchView)
+                .throttleLast(500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .map { it.toString() }
+                .subscribe {
+                    applySearch(it)
+                }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_search_action, menu)
-
-        val searchItem = menu.findItem(R.id.action_search)
-        searchItem.expandActionView()
-
-        val searchView = searchItem.actionView as SearchView
-        //searchView.queryHint = resources.getString(R.string.search)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.searchMusic(query)
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                //mPresenter.searchTask(newText.toUpperCase())
-                return true
-            }
-        })
-        return super.onCreateOptionsMenu(menu)
+    private fun applySearch(text: String) {
+        val fragments = supportFragmentManager.fragments
+        fragments.forEach {
+            (it as? SearchRefreshListener)?.search(text)
+        }
     }
 }

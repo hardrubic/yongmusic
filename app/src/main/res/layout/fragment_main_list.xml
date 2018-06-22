@@ -11,14 +11,30 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_local_music"
+        <LinearLayout
+            android:id="@+id/ll_local"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="@string/local_music"
-            android:textColor="@color/black"
-            android:textSize="@dimen/primary_text_size" />
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:text="@string/local_music"
+                android:textColor="@color/black"
+                android:textSize="@dimen/primary_text_size" />
+
+            <TextView
+                android:id="@+id/tv_local_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/primary_text_size"
+                android:textColor="@color/second_text_color"
+                tools:text="@string/num"/>
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"

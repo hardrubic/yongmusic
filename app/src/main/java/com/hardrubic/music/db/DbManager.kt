@@ -1,6 +1,7 @@
 package com.hardrubic.music.db
 
 import android.content.Context
+import com.hardrubic.music.Constant
 import com.hardrubic.music.db.dataobject.DaoMaster
 import org.greenrobot.greendao.query.QueryBuilder
 import kotlin.properties.Delegates
@@ -10,7 +11,7 @@ class DbManager {
         lateinit var context: Context
         var instance: DbManager by Delegates.notNull()
 
-        private val DB_NAME = "abc_music_db"
+        private val DB_NAME = "${Constant.APP_NAME}_music_db"
 
         fun init(context: Context) {
             this.context = context

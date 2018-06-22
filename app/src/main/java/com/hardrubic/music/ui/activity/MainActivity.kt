@@ -5,9 +5,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
@@ -21,6 +18,7 @@ import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.vm.MainViewModel
 import com.hardrubic.music.service.MusicService
+import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.DiscoverFragment
 import com.hardrubic.music.ui.fragment.MainListFragment
 import com.hardrubic.music.util.PreferencesUtil
@@ -81,7 +79,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        val paperAdapter = MainPaperAdapter(supportFragmentManager)
+        val paperAdapter = MyViewPagerAdapter(supportFragmentManager)
         paperAdapter.addFragment(MainListFragment(), getString(R.string.my))
         paperAdapter.addFragment(DiscoverFragment(), getString(R.string.discover))
 
@@ -142,28 +140,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             dialog.dismiss()
             android.os.Process.killProcess(android.os.Process.myPid())
             System.exit(0)
-        }
-    }
-
-    class MainPaperAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
-        private val fragments = mutableListOf<Fragment>()
-        private val titles = mutableListOf<String>()
-
-        fun addFragment(fragment: Fragment, title: String) {
-            fragments.add(fragment)
-            titles.add(title)
-        }
-
-        override fun getItem(position: Int): Fragment {
-            return fragments[position]
-        }
-
-        override fun getCount(): Int {
-            return fragments.size
-        }
-
-        override fun getPageTitle(position: Int): CharSequence? {
-            return titles[position]
         }
     }
 }

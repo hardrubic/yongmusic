@@ -11,10 +11,8 @@ import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.aidl.MusicAidl
 import com.hardrubic.music.biz.MusicControl
-import com.hardrubic.music.biz.adapter.MusicAidlAdapter
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.listener.MusicStateListener
-import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.fragment.MusicControlFragment
 import com.hardrubic.music.util.LogUtil
 import java.lang.ref.WeakReference
@@ -73,9 +71,9 @@ open class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun notifyCurrentMusic(music: Music) {
+    fun notifyCurrentMusic(musicId: Long) {
         musicStateListeners.forEach {
-            it.updateCurrentMusic(music)
+            it.updateCurrentMusic(musicId)
         }
     }
 
@@ -105,14 +103,14 @@ open class BaseActivity : AppCompatActivity() {
                     val musicAidl = intent.getParcelableExtra<MusicAidl>(Constant.Param.CURRENT_MUSIC)
                     CurrentPlayingHelper.setPlayingMusicId(musicAidl.musicId)
                     LogUtil.d("broadcast receive $action:$musicAidl")
-                    weakReference.get()?.notifyCurrentMusic(MusicAidlAdapter.toCommonMusic(musicAidl))
+                    weakReference.get()?.notifyCurrentMusic(musicAidl.musicId)
                 }
                 Constant.BroadcastAction.PLAY_STATE -> {
                     val flag = intent.getBooleanExtra(Constant.Param.FLAG, false)
                     LogUtil.d("broadcast receive $action:$flag")
                     weakReference.get()?.notifyPlayingState(flag)
                 }
-                //todo add recent
+            //todo add recent
             }
         }
     }

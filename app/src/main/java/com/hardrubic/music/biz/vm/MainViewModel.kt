@@ -43,6 +43,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return collectionRepository.queryCollectionMusicIds(Constant.LOVE_COLLECTION_ID).size
     }
 
+    fun queryLocalMusicNum(): Int {
+        return musicRepository.queryLocalMusic().size
+    }
+
     fun addCollection(name: String, id: Long? = null) {
         collectionRepository.addCollection(name, id)
     }

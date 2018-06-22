@@ -1,8 +1,7 @@
 package com.hardrubic.music.network.response
 
-class MusicResourceResponse {
-    lateinit var data: List<Result>
-    var code: Int = 0
+class MusicResourceResponse : BaseResponse() {
+    var data: List<Result>? = null
 
     class Result {
         var id: Long = 0

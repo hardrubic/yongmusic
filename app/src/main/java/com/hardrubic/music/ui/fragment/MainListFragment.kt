@@ -39,7 +39,7 @@ class MainListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tv_local_music.setOnClickListener {
+        ll_local.setOnClickListener {
             startActivity(Intent(activity, LocalMusicActivity::class.java))
         }
         tv_recent.setOnClickListener {
@@ -78,7 +78,9 @@ class MainListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        //todo async
         tv_love_num.text = getString(R.string.num, viewModel.queryLoveCollectionMusicNum())
+        tv_local_num.text = getString(R.string.num, viewModel.queryLocalMusicNum())
         refreshCollectionList()
     }
 

@@ -12,12 +12,16 @@
     <string name="cancel">取消</string>
     <string name="hint">提示</string>
     <string name="get">获取</string>
+    <string name="retry">重试</string>
     <string name="delete">删除</string>
     <string name="about">关于</string>
     <string name="exit">退出</string>
     <string name="collection">歌单</string>
     <string name="edit">编辑</string>
     <string name="name">名称</string>
+    <string name="single_music">单曲</string>
+    <string name="album">专辑</string>
+    <string name="artist">歌手</string>
 
     <string name="num">(%1$d)</string>
     <string name="hint_need_permission">需要获取权限</string>

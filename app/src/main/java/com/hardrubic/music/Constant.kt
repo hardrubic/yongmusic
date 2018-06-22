@@ -2,7 +2,10 @@ package com.hardrubic.music
 
 class Constant {
     companion object {
-        val LOVE_COLLECTION_ID = 0L
+        const val LOVE_COLLECTION_ID = 0L
+        const val LOCAL_MUSIC_MINIMUM_SIZE = 1024 * 1024 //1M
+        const val LOCAL_MUSIC_MINIMUM_SECOND = 60 * 1000 //1分钟
+        const val APP_NAME = "yong"
     }
 
     object Param {
@@ -28,6 +31,12 @@ class Constant {
         const val PLAY_STATE = "com.hardrubic.music.PLAY_STATE"
     }
 
+    object SpKey {
+        const val PLAY_MODEL = "play_model"
+        const val PLAY_LIST = "play_list"
+        const val PLAYING = "playing"
+    }
+
     object PlayModel {
         //列表循环
         const val LIST = 0
@@ -37,9 +46,9 @@ class Constant {
         const val SINGLE = 2
     }
 
-    object SpKey {
-        const val PLAY_MODEL = "play_model"
-        const val PLAY_LIST = "play_list"
-        const val PLAYING = "playing"
+    object ItemType {
+        const val MUSIC = 0
+        const val ARTIST = 1
+        const val ALBUM = 2
     }
 }
