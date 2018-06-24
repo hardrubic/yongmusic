@@ -10,7 +10,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@mipmap/ic_empty_music" app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@mipmap/ic_empty_cover" app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp" android:layout_marginTop="8dp" app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"/>
 

@@ -23,7 +23,8 @@
     <string name="album">专辑</string>
     <string name="artist">歌手</string>
 
-    <string name="num">(%1$d)</string>
+    <string name="num_with_bracket">(%1$d)</string>
+    <string name="name_with_bracket">(%1$s)</string>
     <string name="hint_need_permission">需要获取权限</string>
     <string name="play_all">播放全部</string>
     <string name="music_num">%1$d首</string>

@@ -29,6 +29,8 @@ public class Music {
 
     @Transient
     private List<Artist> artists;
+    @Transient
+    private Album album;
 
     @Generated(hash = 295747449)
     public Music(Long musicId, String name, String path, List<Long> artistIds,
@@ -59,6 +61,16 @@ public class Music {
     @Keep
     public void setArtists(List<Artist> artists) {
         this.artists = artists;
+    }
+
+    @Keep
+    public Album getAlbum() {
+        return album;
+    }
+
+    @Keep
+    public void setAlbum(Album album) {
+        this.album = album;
     }
 
     public Long getMusicId() {

@@ -16,4 +16,8 @@ object FormatUtil {
     fun formatArtistNames(artistNames: List<String>): String {
         return artistNames.joinToString(separator = "/")
     }
+
+    fun formatAlias(alias: List<String>): String {
+        return alias.joinToString(separator = "/", prefix = "(", postfix = ")")
+    }
 }

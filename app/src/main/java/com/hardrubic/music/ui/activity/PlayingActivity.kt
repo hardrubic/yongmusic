@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.text.TextUtils
 import android.widget.SeekBar
 import android.widget.Toast
 import com.hardrubic.music.Constant
@@ -14,10 +15,12 @@ import com.hardrubic.music.biz.command.*
 import com.hardrubic.music.biz.helper.PlayModelHelper
 import com.hardrubic.music.biz.listener.MusicStateListener
 import com.hardrubic.music.biz.vm.PlayingViewModel
+import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.fragment.PlayListFragment
 import com.hardrubic.music.ui.fragment.PlayingMusicMoreDialogFragment
 import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
 import com.hardrubic.music.util.FormatUtil
+import com.hardrubic.music.util.LoadImageUtil
 import kotlinx.android.synthetic.main.activity_playing.*
 
 class PlayingActivity : BaseActivity(), MusicStateListener {
@@ -139,6 +142,18 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
             love = viewModel.isMusicLove(music.musicId)
             updateLoveState(love!!)
         }
+
+        updateCover(music)
+    }
+
+    private fun updateCover(music: Music) {
+        val albumId = music.albumId ?: return
+
+        val album = viewModel.queryAlbum(albumId) ?: return
+
+        if (!TextUtils.isEmpty(album.picUrl)) {
+            LoadImageUtil.loadFromNetwork(this, album.picUrl, iv_cover)
+        }
     }
 
     override fun updatePlayingState(flag: Boolean) {
@@ -174,7 +189,8 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
         when (requestCode) {
             Constant.RequestCode.SELECT_COLLECTION -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val collectionId = data?.getLongExtra(Constant.Param.COLLECTION_ID, -1) ?: return
+                    val collectionId = data?.getLongExtra(Constant.Param.COLLECTION_ID, -1)
+                            ?: return
                     addMusic2Collection(collectionId)
                 }
             }

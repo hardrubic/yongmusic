@@ -79,8 +79,8 @@ class MainListFragment : Fragment() {
         super.onResume()
 
         //todo async
-        tv_love_num.text = getString(R.string.num, viewModel.queryLoveCollectionMusicNum())
-        tv_local_num.text = getString(R.string.num, viewModel.queryLocalMusicNum())
+        tv_love_num.text = getString(R.string.num_with_bracket, viewModel.queryLoveCollectionMusicNum())
+        tv_local_num.text = getString(R.string.num_with_bracket, viewModel.queryLocalMusicNum())
         refreshCollectionList()
     }
 

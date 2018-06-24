@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/primary_text_size"
                 android:textColor="@color/second_text_color"
-                tools:text="@string/num"/>
+                tools:text="@string/num_with_bracket"/>
 
         </LinearLayout>
 
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/primary_text_size"
                 android:textColor="@color/second_text_color"
-                tools:text="@string/num"/>
+                tools:text="@string/num_with_bracket"/>
 
         </LinearLayout>
 

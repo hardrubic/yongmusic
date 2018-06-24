@@ -1,10 +1,12 @@
 package com.hardrubic.music.ui.adapter
 
+import android.text.TextUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.hardrubic.music.R
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.util.FormatUtil
+import com.hardrubic.music.util.LoadImageUtil
 
 class AlbumListAdapter(data: List<Album>)
     : BaseQuickAdapter<Album, BaseViewHolder>(R.layout.item_album, data) {
@@ -12,13 +14,11 @@ class AlbumListAdapter(data: List<Album>)
     override fun convert(baseViewHolder: BaseViewHolder, album: Album) {
         val position = baseViewHolder.adapterPosition - headerLayoutCount
 
-        baseViewHolder.setText(R.id.tv_name, album.name)
-        if (album.alias != null && album.alias.isNotEmpty()) {
-            baseViewHolder.setText(R.id.tv_alias, album.alias.joinToString(separator = "/", prefix = "(", postfix = ")"))
-            baseViewHolder.setGone(R.id.tv_alias, false)
-        } else {
-            baseViewHolder.setGone(R.id.tv_alias, true)
+        if (!TextUtils.isEmpty(album.picUrl)) {
+            LoadImageUtil.loadFromNetwork(mContext, album.picUrl, baseViewHolder.getView(R.id.iv_cover))
         }
+
+        baseViewHolder.setText(R.id.tv_name, album.name)
 
         val artistName = FormatUtil.formatArtistNames(album.artistNames)
 

@@ -7,9 +7,9 @@ import com.hardrubic.music.biz.command.NextCommand
 import com.hardrubic.music.biz.command.PreviousCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.component.DaggerPlayingViewModelComponent
-import com.hardrubic.music.biz.repository.CollectionRepository
-import com.hardrubic.music.biz.repository.MusicRepository
-import com.hardrubic.music.biz.repository.RecentRepository
+import com.hardrubic.music.biz.repository.*
+import com.hardrubic.music.db.dataobject.Album
+import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Collection
 import com.hardrubic.music.db.dataobject.Music
 import javax.inject.Inject
@@ -21,6 +21,10 @@ class PlayingViewModel(application: Application) : AndroidViewModel(application)
     lateinit var recentRepository: RecentRepository
     @Inject
     lateinit var collectionRepository: CollectionRepository
+    @Inject
+    lateinit var artistRepository: ArtistRepository
+    @Inject
+    lateinit var albumRepository: AlbumRepository
 
     var playingMusic: Music? = null
 
@@ -67,5 +71,13 @@ class PlayingViewModel(application: Application) : AndroidViewModel(application)
         } else {
             collectionRepository.deleteMusicFromCollection(musicId, collectionId)
         }
+    }
+
+    fun queryArtist(id: Long): Artist? {
+        return artistRepository.query(id)
+    }
+
+    fun queryAlbum(id: Long): Album? {
+        return albumRepository.query(id)
     }
 }

@@ -8,6 +8,8 @@ import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Keep;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class Album {
@@ -21,15 +23,33 @@ public class Album {
     @Convert(converter = AliasArrayConverter.class,columnType = String.class)
     private List<String> alias;
     private Long publishTime;
-    @Generated(hash = 623082915)
+    private String picUrl;
+
+    @Transient
+    private List<Artist> artists;
+
+    @Keep
+    public List<Artist> getArtists() {
+        return artists;
+    }
+
+    @Keep
+    public void setArtists(List<Artist> artists) {
+        this.artists = artists;
+    }
+
+
+    @Generated(hash = 599402441)
     public Album(Long albumId, String name, List<Long> artistIds,
-            List<String> artistNames, List<String> alias, Long publishTime) {
+            List<String> artistNames, List<String> alias, Long publishTime,
+            String picUrl) {
         this.albumId = albumId;
         this.name = name;
         this.artistIds = artistIds;
         this.artistNames = artistNames;
         this.alias = alias;
         this.publishTime = publishTime;
+        this.picUrl = picUrl;
     }
     @Generated(hash = 1609191978)
     public Album() {
@@ -70,6 +90,11 @@ public class Album {
     public void setPublishTime(Long publishTime) {
         this.publishTime = publishTime;
     }
-
+    public String getPicUrl() {
+        return this.picUrl;
+    }
+    public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
+    }
 
 }

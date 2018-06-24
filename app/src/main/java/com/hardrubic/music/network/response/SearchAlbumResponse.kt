@@ -21,6 +21,7 @@ class SearchAlbumResponse : BaseResponse() {
             album.artistNames = it.artists?.map { it.name }
             album.publishTime = it.publishTime
             album.alias = it.alias
+            album.picUrl = it.picUrl
             album
         } ?: Collections.emptyList()
     }

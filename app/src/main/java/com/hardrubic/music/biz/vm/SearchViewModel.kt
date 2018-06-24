@@ -8,6 +8,7 @@ import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.command.UpdatePlayListCommand
 import com.hardrubic.music.biz.component.DaggerSearchViewModelComponent
 import com.hardrubic.music.biz.helper.PlayListHelper
+import com.hardrubic.music.biz.repository.AlbumRepository
 import com.hardrubic.music.biz.repository.ArtistRepository
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
@@ -33,6 +34,8 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     lateinit var recentRepository: RecentRepository
     @Inject
     lateinit var artistRepository: ArtistRepository
+    @Inject
+    lateinit var albumRepository: AlbumRepository
 
     val musicData = MutableLiveData<List<Music>>()
     val artistData = MutableLiveData<List<Artist>>()
@@ -82,7 +85,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
                     }
 
                     override fun onSuccess(pair: Pair<String, String>) {
-                        cacheMusic(music, pair.first, pair.second)
+                        cacheMusicResource(music, pair.first, pair.second)
                     }
 
                     override fun onError(e: Throwable) {
@@ -92,7 +95,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     }
 
-    private fun cacheMusic(music: Music, url: String, md5: String) {
+    private fun cacheMusicResource(music: Music, url: String, md5: String) {
         val savePath = FileUtil.getMusicCacheDir(getApplication())
         val saveName = md5
 
@@ -104,13 +107,13 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
                 is Succeed -> finishCacheMusic(music)
             }
         }, Consumer<Throwable> { throwable -> throwable.printStackTrace() })
-
     }
 
     private fun finishCacheMusic(music: Music) {
         recentRepository.add(music.musicId)
         musicRepository.add(music)
         artistRepository.add(music.artists)
+        albumRepository.add(music.album)
         //添加到播放列表
         if (PlayListHelper.add(music)) {
             val musics = PlayListHelper.list().mapNotNull { musicRepository.queryMusic(it) }
