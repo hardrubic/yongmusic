@@ -1,9 +1,12 @@
 package com.hardrubic.music.network
 
+import com.hardrubic.music.application.AppApplication
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.network.response.*
+import com.hardrubic.music.network.response.entity.NeteaseArtistDetail
+import com.hardrubic.music.util.JSUtil
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -11,6 +14,20 @@ import kotlin.properties.Delegates
 
 
 class HttpService {
+
+    fun applyLogin(phone: String, password: String): Single<LoginResponse> {
+        val param = hashMapOf<String, String>()
+        param["phone"] = phone
+        param["password"] = password
+        param["rememberLogin"] = "true"
+
+        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+
+        return api.login(encryptParam)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode())
+    }
 
     //todo 分页
     fun applySearchMusic(searchText: String): Single<List<Music>> {
@@ -74,6 +91,21 @@ class HttpService {
                 .map { response: MusicResourceResponse ->
                     val result = response.data?.first()
                     Pair(result?.url ?: "", result?.md5 ?: "")
+                }
+    }
+
+    fun applyArtistHotMusic(artistId: Long): Single<NeteaseArtistDetail> {
+        val param = hashMapOf<String, String>()
+        param["csrf_token"] = ""
+
+        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+
+        return api.artistHotMusic(artistId, encryptParam)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode<ArtistHotMusicResponse>())
+                .map { response: ArtistHotMusicResponse ->
+                    response.artist!!
                 }
 
     }

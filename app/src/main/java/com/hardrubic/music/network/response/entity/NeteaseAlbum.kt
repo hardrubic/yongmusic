@@ -18,6 +18,8 @@ class NeteaseAlbum {
         album.alias = alias
         album.publishTime = publishTime
         album.artists = artists?.map { it.getArtist() }
+        album.artistIds = artists?.map { it.id }
+        album.artistNames = artists?.map { it.name }
         return album
     }
 }

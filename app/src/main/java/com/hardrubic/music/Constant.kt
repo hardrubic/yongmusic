@@ -16,6 +16,7 @@ class Constant {
         const val LIST = "LIST"
         const val COLLECTION_ID = "COLLECTION_ID"
         const val MUSIC_ID = "MUSIC_ID"
+        const val ARTIST_ID = "ARTIST_ID"
     }
 
     object RequestCode {
@@ -32,6 +33,9 @@ class Constant {
     }
 
     object SpKey {
+        const val IS_LOGIN = "is_login"
+        const val LOGIN_ID = "login_id"
+        const val LOGIN_NAME = "login_name"
         const val PLAY_MODEL = "play_model"
         const val PLAY_LIST = "play_list"
         const val PLAYING = "playing"

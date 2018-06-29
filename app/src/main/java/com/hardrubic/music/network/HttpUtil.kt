@@ -24,7 +24,7 @@ object HttpUtil {
 
 
         if (results.isNotEmpty()) {
-            return TextUtils.join("$", results)
+            return TextUtils.join("&", results)
         }
         return ""
     }

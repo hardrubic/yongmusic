@@ -2,16 +2,19 @@ package com.hardrubic.music.ui.fragment.search
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
 import com.hardrubic.music.biz.listener.DialogBtnListener
 import com.hardrubic.music.biz.listener.SearchRefreshListener
 import com.hardrubic.music.biz.vm.SearchViewModel
+import com.hardrubic.music.ui.activity.ArtistDetailActivity
 import com.hardrubic.music.ui.adapter.ArtistListAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
 import io.reactivex.functions.Consumer
@@ -41,6 +44,9 @@ class SearchArtistListFragment : BaseFragment(), SearchRefreshListener {
         adapter = ArtistListAdapter(Collections.emptyList())
         adapter.setOnItemClickListener { adapter, view, position ->
             val artist = (adapter as ArtistListAdapter).getItem(position)!!
+            startActivity(Intent(activity, ArtistDetailActivity::class.java).apply {
+                putExtra(Constant.Param.ARTIST_ID, artist.artistId)
+            })
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter

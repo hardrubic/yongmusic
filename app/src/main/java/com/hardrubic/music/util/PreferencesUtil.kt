@@ -11,7 +11,7 @@ class PreferencesUtil private constructor(context: Context) {
     }
 
     @JvmOverloads
-    fun getString(key: String, defaultValue: String? = null): String? {
+    fun getString(key: String, defaultValue: String = ""): String {
         return defaultSp.getString(key, defaultValue)
     }
 

@@ -2,6 +2,7 @@ package com.hardrubic.music.network.response.entity
 
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
+import com.hardrubic.music.db.dataobject.Music
 import java.util.*
 
 class NeteaseMusic {
@@ -10,6 +11,23 @@ class NeteaseMusic {
     var artists: List<NeteaseArtist>? = null
     var album: NeteaseAlbum? = null
     var duration = 0
+
+    fun getMusic():Music{
+        val music = Music()
+        music.musicId = id
+        music.name = name
+        music.duration = duration
+        music.artistIds = artists?.map { it.id }
+        music.artistNames = artists?.map { it.name }
+        music.artists = getArtist()
+        music.albumId = getAlbum()?.albumId
+        music.albumName = getAlbum()?.name
+        music.album = getAlbum()
+        music.path = ""
+        music.download = false
+        music.local = false
+        return music
+    }
 
     fun getArtist(): List<Artist> {
         return artists?.map { it.getArtist() } ?: Collections.emptyList()

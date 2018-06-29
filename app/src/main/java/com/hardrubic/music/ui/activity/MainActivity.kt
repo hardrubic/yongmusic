@@ -73,6 +73,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
+        val nav_view_header = nav_view.inflateHeaderView(R.layout.nav_header_main)
+        nav_view_header.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
+        }
         nav_view.setNavigationItemSelectedListener(this)
 
         ll_search.setOnClickListener {

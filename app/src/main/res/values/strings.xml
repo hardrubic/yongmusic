@@ -48,4 +48,14 @@
     <string name="hint_add_music_to_collection_success">成功添加音乐到:%1$s</string>
     <string name="hint_collection_name">请输入歌单标题</string>
     <string name="hint_no_playing_music">当前没有播放中音乐</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- 登录 -->
+    <string name="login_in">登录</string>
+    <string name="account">账号</string>
+    <string name="password">密码</string>
+    <string name="error_invalid_account">账号不合法</string>
+    <string name="error_invalid_password">密码不合法</string>
+    <string name="error_login_fail">登录失败</string>
+    <string name="error_field_required">请输入</string>
 </resources>

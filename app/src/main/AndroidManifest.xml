@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_PROFILE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
     <application
         android:name=".application.AppApplication"
         android:allowBackup="true"
@@ -30,11 +35,12 @@
         <activity android:name=".ui.activity.RecentActivity"/>
         <activity android:name=".ui.activity.CollectionDetailActivity"/>
         <activity android:name=".ui.activity.SelectCollectionActivity"/>
+        <activity android:name=".ui.activity.ArtistDetailActivity"/>
+        <activity android:name=".ui.activity.LoginActivity"/>
 
         <service
             android:name=".service.MusicService"
             android:process=":remote"/>
-
 
     </application>
 

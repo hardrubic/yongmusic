@@ -1,13 +1,14 @@
 package com.hardrubic.music.network
 
-import com.hardrubic.music.network.response.MusicResourceResponse
-import com.hardrubic.music.network.response.SearchAlbumResponse
-import com.hardrubic.music.network.response.SearchArtistResponse
-import com.hardrubic.music.network.response.SearchMusicResponse
+import com.hardrubic.music.network.response.*
 import io.reactivex.Single
 import retrofit2.http.*
 
 public interface HttpApi {
+
+    @FormUrlEncoded
+    @POST("/weapi/login/cellphone/")
+    fun login(@FieldMap paramMap: Map<String, String>): Single<LoginResponse>
 
     @FormUrlEncoded
     @POST("/api/search/pc/")
@@ -23,4 +24,9 @@ public interface HttpApi {
 
     @GET("/api/song/enhance/player/url/")
     fun musicResource(@QueryMap paramMap: Map<String, String>): Single<MusicResourceResponse>
+
+    @FormUrlEncoded
+    @POST("/weapi/v1/artist/{id}")
+    @Headers("Referer:https://music.163.com/")
+    fun artistHotMusic(@Path("id") artistId: Long, @FieldMap paramMap: Map<String, String>): Single<ArtistHotMusicResponse>
 }

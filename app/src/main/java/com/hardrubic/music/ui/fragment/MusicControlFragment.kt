@@ -3,6 +3,7 @@ package com.hardrubic.music.ui.fragment
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +15,11 @@ import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.listener.MusicStateListener
 import com.hardrubic.music.biz.vm.MusicControlViewModel
+import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.activity.BaseActivity
 import com.hardrubic.music.ui.activity.PlayingActivity
 import com.hardrubic.music.util.FormatUtil
+import com.hardrubic.music.util.LoadImageUtil
 import kotlinx.android.synthetic.main.fragment_music_control.*
 
 
@@ -82,6 +85,18 @@ class MusicControlFragment : BaseFragment(), MusicStateListener {
         tv_music_name.text = music.name
         tv_artist.text = FormatUtil.formatArtistNames(music.artistNames)
         pb_progress.max = music.duration
+
+        updateCover(music)
+    }
+
+    private fun updateCover(music: Music) {
+        val albumId = music.albumId ?: return
+
+        val album = viewModel.queryAlbum(albumId) ?: return
+
+        if (!TextUtils.isEmpty(album.picUrl)) {
+            LoadImageUtil.loadFromNetwork(mActivity, album.picUrl, iv_cover)
+        }
     }
 
     override fun updatePlayingState(flag: Boolean) {
