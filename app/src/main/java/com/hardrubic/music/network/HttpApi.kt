@@ -29,4 +29,9 @@ public interface HttpApi {
     @POST("/weapi/v1/artist/{id}")
     @Headers("Referer:https://music.163.com/")
     fun artistHotMusic(@Path("id") artistId: Long, @FieldMap paramMap: Map<String, String>): Single<ArtistHotMusicResponse>
+
+    @FormUrlEncoded
+    @POST("/weapi/v1/album/{id}")
+    @Headers("Referer:https://music.163.com/")
+    fun albumDetail(@Path("id") albumId: Long, @FieldMap paramMap: Map<String, String>): Single<AlbumDetailResponse>
 }

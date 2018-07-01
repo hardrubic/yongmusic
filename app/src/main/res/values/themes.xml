@@ -18,4 +18,9 @@
         <item name="android:background">@color/colorPrimary</item>
     </style>
 
+    <style name="MusicControlStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">54dp</item>
+    </style>
+
 </resources>

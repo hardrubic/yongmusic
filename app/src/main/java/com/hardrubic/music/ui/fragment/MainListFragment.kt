@@ -12,9 +12,7 @@ import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.vm.MainViewModel
-import com.hardrubic.music.ui.activity.CollectionDetailActivity
-import com.hardrubic.music.ui.activity.LocalMusicActivity
-import com.hardrubic.music.ui.activity.RecentActivity
+import com.hardrubic.music.ui.activity.*
 import com.hardrubic.music.ui.adapter.CollectionAdapter
 import kotlinx.android.synthetic.main.fragment_main_list.*
 import java.util.*
@@ -45,9 +43,19 @@ class MainListFragment : Fragment() {
         tv_recent.setOnClickListener {
             startActivity(Intent(activity, RecentActivity::class.java))
         }
-
         ll_love.setOnClickListener {
             startCollectionDetail(Constant.LOVE_COLLECTION_ID)
+        }
+        ll_store.setOnClickListener {
+            //just for test
+            startActivity(Intent(activity, AlbumDetailActivity::class.java).apply {
+                putExtra(Constant.Param.ALBUM_ID, 6452)
+            })
+            /*
+            startActivity(Intent(activity, ArtistDetailActivity::class.java).apply {
+                putExtra(Constant.Param.ARTIST_ID, 6452)
+            })
+            */
         }
 
         iv_add_collection.setOnClickListener {

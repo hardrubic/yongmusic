@@ -13,12 +13,12 @@ class MusicListAdapter(data: List<Music>)
     override fun convert(baseViewHolder: BaseViewHolder, music: Music) {
         val position = baseViewHolder.adapterPosition - headerLayoutCount
 
+        val formatArtistName = FormatUtil.formatArtistNames(music.artistNames)
         val formatDuration = FormatUtil.formatDuration(music.duration.toLong())
 
         baseViewHolder.setText(R.id.tv_name, music.name)
-        baseViewHolder.setText(R.id.tv_artist, FormatUtil.formatArtistNames(music.artistNames))
+        baseViewHolder.setText(R.id.tv_info, "$formatArtistName - ${music.albumName}")
         baseViewHolder.setText(R.id.tv_duration, formatDuration)
-        baseViewHolder.setText(R.id.tv_size, if (music.size != null) Formatter.formatFileSize(mContext, music.size.toLong()) else "--")
     }
 
 }

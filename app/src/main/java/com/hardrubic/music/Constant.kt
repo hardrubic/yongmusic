@@ -14,9 +14,12 @@ class Constant {
         const val PROGRESS = "PROGRESS"
         const val FLAG = "FLAG"
         const val LIST = "LIST"
+        const val NAME = "NAME"
         const val COLLECTION_ID = "COLLECTION_ID"
         const val MUSIC_ID = "MUSIC_ID"
         const val ARTIST_ID = "ARTIST_ID"
+        const val ALBUM_ID = "ALBUM_ID"
+        const val MUSIC_LIST = "MUSIC_LIST"
     }
 
     object RequestCode {

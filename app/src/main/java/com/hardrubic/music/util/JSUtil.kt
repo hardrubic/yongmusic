@@ -31,7 +31,9 @@ object JSUtil {
         val key = jsonObject.get(ENC_TEXT).toString().replace("\"", "")
         val value = jsonObject.get(ENC_SEC_KEY).toString().replace("\"", "")
 
-        LogUtil.d("buildEncryptParamMap time:${(System.currentTimeMillis() - time1) / 1000}s")
+        val buildTimeSecond = (System.currentTimeMillis() - time1) / 1000f
+
+        LogUtil.d("buildEncryptParamMap at ${Thread.currentThread().name},time:${buildTimeSecond}s")
 
         return hashMapOf<String, String>().apply {
             put("params", key)

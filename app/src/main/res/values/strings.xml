@@ -22,6 +22,9 @@
     <string name="single_music">单曲</string>
     <string name="album">专辑</string>
     <string name="artist">歌手</string>
+    <string name="store">收藏</string>
+    <string name="music">歌曲</string>
+    <string name="introduction">介绍</string>
 
     <string name="num_with_bracket">(%1$d)</string>
     <string name="name_with_bracket">(%1$s)</string>
@@ -38,7 +41,8 @@
     <string name="recent_play">最近播放</string>
     <string name="loading">加载中，请稍后</string>
     <string name="my_music_collect">我的歌单</string>
-    <string name="my_love">我喜欢</string>
+    <string name="my_love">我喜欢的</string>
+    <string name="my_store">我的收藏</string>
     <string name="add_collection">新建歌单</string>
     <string name="save_to_collection">收藏到歌单</string>
     <string name="select_collection">选择歌单</string>

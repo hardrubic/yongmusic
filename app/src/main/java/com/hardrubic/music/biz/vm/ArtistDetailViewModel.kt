@@ -7,6 +7,7 @@ import com.hardrubic.music.biz.component.DaggerArtistDetailViewModelComponent
 import com.hardrubic.music.biz.repository.CollectionRepository
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.network.HttpService
+import com.hardrubic.music.network.response.ArtistHotMusicResponse
 import com.hardrubic.music.network.response.entity.NeteaseArtistDetail
 import io.reactivex.functions.Consumer
 import javax.inject.Inject
@@ -17,10 +18,8 @@ class ArtistDetailViewModel(application: Application) : AndroidViewModel(applica
     lateinit var musicRepository: MusicRepository
     @Inject
     lateinit var collectionRepository: CollectionRepository
-    //@Inject
-    //lateinit var artistRepository: ArtistRepository
 
-    public var artistDetailData = MutableLiveData<NeteaseArtistDetail>()
+    public var artistDetailData = MutableLiveData<ArtistHotMusicResponse>()
 
     init {
         DaggerArtistDetailViewModelComponent.builder().build().inject(this)

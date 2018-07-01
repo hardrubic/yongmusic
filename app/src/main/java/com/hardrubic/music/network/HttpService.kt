@@ -94,7 +94,7 @@ class HttpService {
                 }
     }
 
-    fun applyArtistHotMusic(artistId: Long): Single<NeteaseArtistDetail> {
+    fun applyArtistHotMusic(artistId: Long): Single<ArtistHotMusicResponse> {
         val param = hashMapOf<String, String>()
         param["csrf_token"] = ""
 
@@ -103,11 +103,19 @@ class HttpService {
         return api.artistHotMusic(artistId, encryptParam)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(CheckResponseCode<ArtistHotMusicResponse>())
-                .map { response: ArtistHotMusicResponse ->
-                    response.artist!!
-                }
+                .compose(CheckResponseCode())
+    }
 
+    fun applyAlbumDetail(albumId: Long): Single<AlbumDetailResponse> {
+        val param = hashMapOf<String, String>()
+        param["csrf_token"] = ""
+
+        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+
+        return api.albumDetail(albumId, encryptParam)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode())
     }
 
     companion object {

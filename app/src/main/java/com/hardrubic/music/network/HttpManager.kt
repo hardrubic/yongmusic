@@ -17,6 +17,7 @@ class HttpManager {
 
     init {
         val cookieManager = object : CookieJar {
+            //TODO 持久化
             private val cookiesMap = hashMapOf<String, List<Cookie>>()
 
             override fun saveFromResponse(url: HttpUrl, inputCookies: MutableList<Cookie>) {
@@ -27,12 +28,12 @@ class HttpManager {
                 }
                 cookiesMap[host] = inputCookies
 
-                LogUtil.d("http cookie:$host -> $inputCookies")
+                //LogUtil.d("http cookie:$host -> $inputCookies")
             }
 
             override fun loadForRequest(url: HttpUrl): MutableList<Cookie> {
                 val cookies = cookiesMap[url.host()]?.toMutableList() ?: Collections.emptyList()
-                LogUtil.d("http load cookie:$cookies")
+                //LogUtil.d("http load cookie:$cookies")
                 return cookies
             }
         }
