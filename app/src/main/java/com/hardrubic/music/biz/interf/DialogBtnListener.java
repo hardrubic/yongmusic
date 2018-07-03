@@ -1,4 +1,4 @@
-package com.hardrubic.music.biz.listener;
+package com.hardrubic.music.biz.interf;
 
 import android.content.DialogInterface;
 

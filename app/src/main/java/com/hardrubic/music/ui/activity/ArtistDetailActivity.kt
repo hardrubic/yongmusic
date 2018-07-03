@@ -8,19 +8,21 @@ import android.support.design.widget.TabLayout
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
-import com.hardrubic.music.biz.listener.DialogBtnListener
+import com.hardrubic.music.biz.interf.DialogBtnListener
 import com.hardrubic.music.biz.vm.ArtistDetailViewModel
-import com.hardrubic.music.network.response.ArtistHotMusicResponse
+import com.hardrubic.music.entity.vo.AlbumVO
+import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.response.entity.NeteaseArtistDetail
 import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
+import com.hardrubic.music.ui.fragment.ArtistAlbumFragment
 import com.hardrubic.music.ui.fragment.ArtistDescFragment
 import com.hardrubic.music.ui.fragment.CommonMusicListFragment
-import com.hardrubic.music.ui.fragment.search.SearchMusicListFragment
 import com.hardrubic.music.util.LoadImageUtil
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_artist_detail.*
 import java.io.Serializable
-import java.util.*
+import java.util.concurrent.CountDownLatch
+import kotlin.concurrent.thread
 
 class ArtistDetailActivity : BaseActivity() {
 
@@ -36,17 +38,8 @@ class ArtistDetailActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_artist_detail)
 
-        initData()
         initView()
-        applyQueryArtistDetail()
-    }
-
-    private fun initData() {
-        viewModel.artistDetailData.observe(this, Observer {
-            it?.let {
-                refreshArtistDetail(it)
-            }
-        })
+        applyQueryData()
     }
 
     private fun initView() {
@@ -58,21 +51,25 @@ class ArtistDetailActivity : BaseActivity() {
         showMusicControl()
     }
 
-    private fun refreshArtistDetail(artistDetail: ArtistHotMusicResponse) {
-        val artist = artistDetail.artist!!
-
+    private fun refreshArtistDetail(artist: NeteaseArtistDetail, musics: List<MusicVO>, albums: List<AlbumVO>) {
         collapsing_toolbar_layout.title = artist.name
         LoadImageUtil.loadFromNetwork(this, artist.picUrl, iv_cover)
 
         val commonMusicListFragmentArg = Bundle().apply {
-            putSerializable(Constant.Param.LIST, artistDetail.getMusicVOs() as Serializable)
+            putSerializable(Constant.Param.LIST, musics as Serializable)
         }
+        val artistAlbumFragmentArg = Bundle().apply {
+            putSerializable(Constant.Param.LIST, albums as Serializable)
+        }
+        val artistDescFragmentArg = Bundle().apply {
+            putString(Constant.Param.NAME, artist.briefDesc)
+        }
+
         val commonMusicListFragment = CommonMusicListFragment().apply {
             arguments = commonMusicListFragmentArg
         }
-
-        val artistDescFragmentArg = Bundle().apply {
-            putString(Constant.Param.NAME, artist.briefDesc)
+        val artistAlbumFragment = ArtistAlbumFragment().apply {
+            arguments = artistAlbumFragmentArg
         }
         val artistDescFragment = ArtistDescFragment().apply {
             arguments = artistDescFragmentArg
@@ -80,7 +77,7 @@ class ArtistDetailActivity : BaseActivity() {
 
         vp_list.adapter = MyViewPagerAdapter(supportFragmentManager).apply {
             addFragment(commonMusicListFragment, getString(R.string.music))
-            addFragment(artistDescFragment, getString(R.string.album))
+            addFragment(artistAlbumFragment, getString(R.string.album))
             addFragment(artistDescFragment, getString(R.string.introduction))
         }
         tab.tabMode = TabLayout.MODE_FIXED
@@ -99,11 +96,54 @@ class ArtistDetailActivity : BaseActivity() {
         tab.setupWithViewPager(vp_list)
     }
 
+    private fun applyQueryData() {
+        applyQueryArtistDetail()
+        applyQueryArtistAlbum()
+
+        thread {
+            val countDownLatch = CountDownLatch(3)
+
+            viewModel.artistDetailData.observe(this, Observer {
+                countDownLatch.countDown()
+            })
+            viewModel.artistHotMusicData.observe(this, Observer {
+                countDownLatch.countDown()
+            })
+            viewModel.artistHotAlbumData.observe(this, Observer {
+                countDownLatch.countDown()
+            })
+
+            countDownLatch.await()
+
+            runOnUiThread {
+                refreshArtistDetail(viewModel.artistDetailData.value!!,
+                        viewModel.artistHotMusicData.value!!,
+                        viewModel.artistHotAlbumData.value!!)
+            }
+        }
+    }
+
     private fun applyQueryArtistDetail() {
         viewModel.internalQueryArtistDetail(artistId, Consumer { throwable ->
             ShowExceptionHelper.show(this, throwable, object : DialogBtnListener {
                 override fun onClickOkListener(dialog: DialogInterface?) {
                     applyQueryArtistDetail()
+                    dialog?.dismiss()
+                }
+
+                override fun onClickCancelListener(dialog: DialogInterface?) {
+                    dialog?.dismiss()
+                }
+            })
+            throwable.printStackTrace()
+        })
+    }
+
+    private fun applyQueryArtistAlbum() {
+        viewModel.internalQueryArtistHotAlbum(artistId, Consumer { throwable ->
+            ShowExceptionHelper.show(this, throwable, object : DialogBtnListener {
+                override fun onClickOkListener(dialog: DialogInterface?) {
+                    applyQueryArtistAlbum()
                     dialog?.dismiss()
                 }
 

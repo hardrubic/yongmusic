@@ -9,21 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
-import com.hardrubic.music.biz.listener.DialogBtnListener
-import com.hardrubic.music.biz.listener.SearchRefreshListener
+import com.hardrubic.music.biz.interf.DialogBtnListener
+import com.hardrubic.music.biz.interf.Searchable
 import com.hardrubic.music.biz.vm.SearchViewModel
-import com.hardrubic.music.ui.adapter.MusicListAdapter
+import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
 
-class SearchMusicListFragment : BaseFragment(), SearchRefreshListener {
+class SearchMusicListFragment : BaseFragment(), Searchable {
     private val viewModel: SearchViewModel by lazy {
         ViewModelProviders.of(mActivity).get(SearchViewModel::class.java)
     }
 
-    private lateinit var adapter: MusicListAdapter
+    private lateinit var adapter: ShowMusicAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_search_result_list, container, false)
@@ -37,11 +37,13 @@ class SearchMusicListFragment : BaseFragment(), SearchRefreshListener {
     }
 
     private fun initView() {
-        adapter = MusicListAdapter(Collections.emptyList())
+        adapter = ShowMusicAdapter(Collections.emptyList())
         adapter.setOnItemClickListener { adapter, view, position ->
-            val music = (adapter as MusicListAdapter).getItem(position)!!
+            val musicVO = (adapter as ShowMusicAdapter).getItem(position)!!
 
-            viewModel.applyCacheAndPlayMusic(music)
+            viewModel.selectMusic(musicVO.musicId, Consumer {
+                ShowExceptionHelper.show(mActivity, it)
+            })
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter

@@ -13,7 +13,7 @@ import com.hardrubic.music.biz.command.ApplyPlayStateCommand
 import com.hardrubic.music.biz.command.PlayOrPauseCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
-import com.hardrubic.music.biz.listener.MusicStateListener
+import com.hardrubic.music.biz.interf.MusicStateListener
 import com.hardrubic.music.biz.vm.MusicControlViewModel
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.activity.BaseActivity

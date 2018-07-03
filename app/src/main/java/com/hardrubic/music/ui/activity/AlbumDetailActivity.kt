@@ -1,13 +1,14 @@
 package com.hardrubic.music.ui.activity
 
+import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
-import com.hardrubic.music.biz.listener.DialogBtnListener
+import com.hardrubic.music.biz.interf.DialogBtnListener
 import com.hardrubic.music.network.HttpService
 import com.hardrubic.music.network.response.AlbumDetailResponse
 import com.hardrubic.music.ui.fragment.CommonMusicListFragment
@@ -95,5 +96,13 @@ class AlbumDetailActivity : BaseActivity() {
                     })
                     it.printStackTrace()
                 })
+    }
+
+    companion object {
+        fun start(context: Context, albumId: Long) {
+            context.startActivity(Intent(context, AlbumDetailActivity::class.java).apply {
+                putExtra(Constant.Param.ALBUM_ID, albumId)
+            })
+        }
     }
 }

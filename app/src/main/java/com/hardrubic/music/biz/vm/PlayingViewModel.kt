@@ -21,10 +21,6 @@ class PlayingViewModel(application: Application) : AndroidViewModel(application)
     lateinit var recentRepository: RecentRepository
     @Inject
     lateinit var collectionRepository: CollectionRepository
-    @Inject
-    lateinit var artistRepository: ArtistRepository
-    @Inject
-    lateinit var albumRepository: AlbumRepository
 
     var playingMusic: Music? = null
 
@@ -74,10 +70,10 @@ class PlayingViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun queryArtist(id: Long): Artist? {
-        return artistRepository.query(id)
+        return musicRepository.queryArtist(id)
     }
 
     fun queryAlbum(id: Long): Album? {
-        return albumRepository.query(id)
+        return musicRepository.queryAlbum(id)
     }
 }

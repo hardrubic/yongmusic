@@ -8,6 +8,7 @@ import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.util.FormatUtil
 import com.hardrubic.music.util.LoadImageUtil
 
+@Deprecated("ShowAlbumAdapter")
 class AlbumListAdapter(data: List<Album>)
     : BaseQuickAdapter<Album, BaseViewHolder>(R.layout.item_album, data) {
 

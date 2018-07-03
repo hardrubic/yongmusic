@@ -2,17 +2,15 @@ package com.hardrubic.music.ui.fragment.search
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
-import com.hardrubic.music.biz.listener.DialogBtnListener
-import com.hardrubic.music.biz.listener.SearchRefreshListener
+import com.hardrubic.music.biz.interf.DialogBtnListener
+import com.hardrubic.music.biz.interf.Searchable
 import com.hardrubic.music.biz.vm.SearchViewModel
 import com.hardrubic.music.ui.activity.AlbumDetailActivity
 import com.hardrubic.music.ui.adapter.AlbumListAdapter
@@ -21,7 +19,7 @@ import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
 
-class SearchAlbumListFragment : BaseFragment(), SearchRefreshListener {
+class SearchAlbumListFragment : BaseFragment(), Searchable {
 
     private val viewModel: SearchViewModel by lazy {
         ViewModelProviders.of(mActivity).get(SearchViewModel::class.java)
@@ -44,10 +42,7 @@ class SearchAlbumListFragment : BaseFragment(), SearchRefreshListener {
         adapter = AlbumListAdapter(Collections.emptyList())
         adapter.setOnItemClickListener { adapter, view, position ->
             val album = (adapter as AlbumListAdapter).getItem(position)!!
-
-            startActivity(Intent(activity, AlbumDetailActivity::class.java).apply {
-                putExtra(Constant.Param.ALBUM_ID, album.albumId)
-            })
+            AlbumDetailActivity.start(mActivity, album.albumId)
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter

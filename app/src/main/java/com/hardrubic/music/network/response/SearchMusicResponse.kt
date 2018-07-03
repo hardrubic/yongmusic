@@ -1,6 +1,6 @@
 package com.hardrubic.music.network.response
 
-import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.response.entity.NeteaseMusic
 import java.util.*
 
@@ -12,9 +12,9 @@ class SearchMusicResponse : BaseResponse() {
         var sonCount: Int = -1
     }
 
-    fun getMusics(): List<Music> {
+    fun getMusicVO(): List<MusicVO> {
         return result?.songs?.map {
-            it.getMusic()
+            it.getMusicVO()
         } ?: Collections.emptyList()
     }
 }

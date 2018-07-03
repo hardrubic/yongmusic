@@ -23,42 +23,33 @@ public class Recent {
     private transient RecentDao myDao;
     @Generated(hash = 993622651)
     private transient Long music__resolvedKey;
-
     @Generated(hash = 306247849)
     public Recent(Long musicId, Long lastTime, Integer count) {
         this.musicId = musicId;
         this.lastTime = lastTime;
         this.count = count;
     }
-
     @Generated(hash = 1212650171)
     public Recent() {
     }
-
     public Long getMusicId() {
         return this.musicId;
     }
-
     public void setMusicId(Long musicId) {
         this.musicId = musicId;
     }
-
     public Long getLastTime() {
         return this.lastTime;
     }
-
     public void setLastTime(Long lastTime) {
         this.lastTime = lastTime;
     }
-
     public Integer getCount() {
         return this.count;
     }
-
     public void setCount(Integer count) {
         this.count = count;
     }
-
     /** To-one relationship, resolved on first access. */
     @Generated(hash = 1361111467)
     public Music getMusic() {
@@ -77,7 +68,6 @@ public class Recent {
         }
         return music;
     }
-
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1915972305)
     public void setMusic(Music music) {
@@ -87,7 +77,6 @@ public class Recent {
             music__resolvedKey = musicId;
         }
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
      * Entity must attached to an entity context.
@@ -99,7 +88,6 @@ public class Recent {
         }
         myDao.delete(this);
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
      * Entity must attached to an entity context.
@@ -111,7 +99,6 @@ public class Recent {
         }
         myDao.refresh(this);
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
      * Entity must attached to an entity context.
@@ -123,13 +110,13 @@ public class Recent {
         }
         myDao.update(this);
     }
-
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 952737433)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getRecentDao() : null;
     }
+
 
 
 }

@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.vm.RecentViewModel
-import com.hardrubic.music.db.dataobject.Music
-import com.hardrubic.music.ui.adapter.MusicListAdapter
+import com.hardrubic.music.entity.vo.MusicVO
+import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import kotlinx.android.synthetic.main.activity_recent.*
 import java.util.*
 
@@ -15,7 +15,7 @@ class RecentActivity : BaseActivity() {
     private val viewModel: RecentViewModel by lazy {
         ViewModelProviders.of(this).get(RecentViewModel::class.java)
     }
-    private lateinit var musicAdapter: MusicListAdapter
+    private lateinit var musicAdapter: ShowMusicAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +27,8 @@ class RecentActivity : BaseActivity() {
     }
 
     private fun initData() {
-        viewModel.recentData.observe(this, android.arch.lifecycle.Observer<List<Music>> { musics ->
-            musicAdapter.setNewData(musics)
+        viewModel.recentData.observe(this, android.arch.lifecycle.Observer<List<MusicVO>> {
+            musicAdapter.setNewData(it)
         })
     }
 
@@ -40,10 +40,10 @@ class RecentActivity : BaseActivity() {
 
         showMusicControl()
 
-        musicAdapter = MusicListAdapter(Collections.emptyList())
+        musicAdapter = ShowMusicAdapter(Collections.emptyList())
         musicAdapter.setOnItemClickListener { adapter, view, position ->
-            val music = (adapter as MusicListAdapter).getItem(position)!!
-            viewModel.selectRecentMusic(music)
+            val vo = (adapter as ShowMusicAdapter).getItem(position)!!
+            viewModel.selectMusic(listOf(vo.musicId))
 
         }
         rv_list.layoutManager = LinearLayoutManager(this)

@@ -10,7 +10,7 @@ import android.view.MenuItem
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.vm.CollectionDetailViewModel
-import com.hardrubic.music.ui.adapter.MusicListAdapter
+import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.widget.view.MusicBatchHeaderView
 import com.hardrubic.music.ui.widget.view.OnMusicBatchHeaderViewListener
 import kotlinx.android.synthetic.main.activity_collection_detail.*
@@ -22,7 +22,7 @@ class CollectionDetailActivity : BaseActivity() {
         viewModel.queryCollection(id)!!
     }
 
-    private lateinit var adapter: MusicListAdapter
+    private lateinit var adapter: ShowMusicAdapter
     private val viewModel: CollectionDetailViewModel by lazy {
         ViewModelProviders.of(this).get(CollectionDetailViewModel::class.java)
     }
@@ -58,24 +58,25 @@ class CollectionDetailActivity : BaseActivity() {
 
         tv_name.text = collection.name
 
-        val musics = viewModel.queryCollectionMusics(collection.id)
+        val musicVOs = viewModel.queryCollectionMusicVOs(collection.id)
 
         val headView = MusicBatchHeaderView(this)
-        headView.refreshNum(musics.size)
+        headView.refreshNum(musicVOs.size)
         headView.listener = object : OnMusicBatchHeaderViewListener {
             override fun selectAll() {
-                viewModel.selectMusic(adapter.data)
+                viewModel.selectMusic(adapter.data.map { it.musicId })
             }
         }
 
-        adapter = MusicListAdapter(musics)
+        adapter = ShowMusicAdapter(musicVOs)
         adapter.addHeaderView(headView)
         adapter.setOnItemClickListener { adapter, view, position ->
-            adapter as MusicListAdapter
-            val musics = adapter.data
-            val playMusic = adapter.getItem(position)!!
+            adapter as ShowMusicAdapter
+            val vos = adapter.data
+            val musicIds = vos.map { it.musicId }
+            val playMusicId = adapter.getItem(position)!!.musicId
 
-            viewModel.selectMusic(musics, playMusic)
+            viewModel.selectMusic(musicIds, playMusicId)
         }
 
         rv_list.layoutManager = LinearLayoutManager(this)

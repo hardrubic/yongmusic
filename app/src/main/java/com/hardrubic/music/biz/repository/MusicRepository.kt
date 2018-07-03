@@ -1,14 +1,18 @@
 package com.hardrubic.music.biz.repository
 
 import com.hardrubic.music.db.DbManager
-import com.hardrubic.music.db.dataobject.Music
-import com.hardrubic.music.db.dataobject.MusicDao
-import com.hardrubic.music.db.dataobject.RecentDao
+import com.hardrubic.music.db.dataobject.*
 import javax.inject.Inject
 
 class MusicRepository @Inject constructor() {
     private val musicDao: MusicDao
         get() = DbManager.instance.session.musicDao
+
+    private val albumDao: AlbumDao
+        get() = DbManager.instance.session.albumDao
+
+    private val artistDao: ArtistDao
+        get() = DbManager.instance.session.artistDao
 
     private val recentDao: RecentDao
         get() = DbManager.instance.session.recentDao
@@ -29,19 +33,56 @@ class MusicRepository @Inject constructor() {
         return queryBuilder.list()
     }
 
-    fun add(music: Music) {
-        add(listOf(music))
+    fun addMusic(music: Music) {
+        addMusic(listOf(music))
     }
 
-    fun add(musics: List<Music>) {
+    fun addMusic(musics: List<Music>) {
         musicDao.insertOrReplaceInTx(musics)
+
+        for (music in musics) {
+            if (music.album != null) {
+                addAlbum(music.album)
+            }
+            if (music.artists != null && music.artists.isNotEmpty()) {
+                addArtist(music.artists)
+            }
+        }
     }
 
-    fun delete(id: Long) {
+    fun deleteMusic(id: Long) {
         musicDao.deleteByKey(id)
     }
 
-    fun delete(ids: List<Long>) {
+    fun deleteMusic(ids: List<Long>) {
         musicDao.deleteByKeyInTx(ids)
+    }
+
+    fun queryAlbum(albumId: Long): Album? {
+        return albumDao.load(albumId)
+    }
+
+    fun addAlbum(album: Album) {
+        addAlbum(listOf(album))
+    }
+
+    fun addAlbum(albums: List<Album>) {
+        if (albums.isNotEmpty()) {
+            albumDao.insertOrReplaceInTx(albums)
+        }
+    }
+
+    fun queryArtist(artistId: Long): Artist? {
+        return artistDao.load(artistId)
+    }
+
+    fun addArtist(artist: Artist) {
+        addArtist(listOf(artist))
+    }
+
+    fun addArtist(artists: List<Artist>) {
+        if (artists.isNotEmpty()) {
+            artistDao.insertOrReplaceInTx(artists)
+        }
     }
 }

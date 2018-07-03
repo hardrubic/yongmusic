@@ -1,4 +1,4 @@
-package com.hardrubic.music.ui.adapter
+package com.hardrubic.music.ui.adapter.show
 
 import android.text.format.Formatter
 import com.chad.library.adapter.base.BaseQuickAdapter

@@ -16,14 +16,13 @@ public class Music {
     private Long musicId;
     private String name;
     private String path;
-    @Convert(converter = IdsConverter.class,columnType = String.class)
+    @Convert(converter = IdsConverter.class, columnType = String.class)
     private List<Long> artistIds;
-    @Convert(converter = NamesConverter.class,columnType = String.class)
+    @Convert(converter = NamesConverter.class, columnType = String.class)
     private List<String> artistNames;
     private Long albumId;
     private String albumName;
     private Integer duration;
-    private Integer size;
     private Boolean local;//本地music
     private Boolean download;//下载music
 
@@ -32,10 +31,10 @@ public class Music {
     @Transient
     private Album album;
 
-    @Generated(hash = 295747449)
+    @Generated(hash = 471745276)
     public Music(Long musicId, String name, String path, List<Long> artistIds,
             List<String> artistNames, Long albumId, String albumName,
-            Integer duration, Integer size, Boolean local, Boolean download) {
+            Integer duration, Boolean local, Boolean download) {
         this.musicId = musicId;
         this.name = name;
         this.path = path;
@@ -44,7 +43,6 @@ public class Music {
         this.albumId = albumId;
         this.albumName = albumName;
         this.duration = duration;
-        this.size = size;
         this.local = local;
         this.download = download;
     }
@@ -135,14 +133,6 @@ public class Music {
 
     public void setDuration(Integer duration) {
         this.duration = duration;
-    }
-
-    public Integer getSize() {
-        return this.size;
-    }
-
-    public void setSize(Integer size) {
-        this.size = size;
     }
 
     public Boolean getLocal() {

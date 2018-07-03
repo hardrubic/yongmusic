@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import com.hardrubic.music.aidl.MusicManager
-import com.hardrubic.music.biz.adapter.MusicAidlAdapter
+import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.service.MusicService
 import com.hardrubic.music.util.LogUtil
@@ -43,7 +43,7 @@ class MusicControl private constructor() {
     }
 
     fun applySelectMusic(music: Music) {
-        musicManager?.select(MusicAidlAdapter.toMusicAidl(music))
+        musicManager?.select(MusicEntityAdapter.toMusicAidl(music))
     }
 
     fun applyPlayOrPause() {
@@ -63,7 +63,7 @@ class MusicControl private constructor() {
     }
 
     fun applyUpdatePlayList(musics: List<Music>) {
-        musicManager?.playList(musics.map { MusicAidlAdapter.toMusicAidl(it) })
+        musicManager?.playList(musics.map { MusicEntityAdapter.toMusicAidl(it) })
     }
 
     fun applyPrevious() {

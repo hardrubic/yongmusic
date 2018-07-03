@@ -3,13 +3,11 @@ package com.hardrubic.music.ui.activity
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v7.widget.AppCompatEditText
-import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import android.widget.Toolbar
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.listener.SearchRefreshListener
+import com.hardrubic.music.biz.interf.Searchable
 import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.search.SearchAlbumListFragment
 import com.hardrubic.music.ui.fragment.search.SearchArtistListFragment
@@ -77,6 +75,6 @@ class SearchActivity : BaseActivity() {
     private fun applySearch(text: String) {
         val position = vp_list.currentItem
         val fragment = (vp_list.adapter as MyViewPagerAdapter).getItem(position)
-        (fragment as? SearchRefreshListener)?.search(text)
+        (fragment as? Searchable)?.search(text)
     }
 }

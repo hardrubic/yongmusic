@@ -1,11 +1,14 @@
 package com.hardrubic.music.network
 
+import com.google.gson.Gson
 import com.hardrubic.music.application.AppApplication
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicResourceBO
+import com.hardrubic.music.entity.vo.AlbumVO
+import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.response.*
-import com.hardrubic.music.network.response.entity.NeteaseArtistDetail
 import com.hardrubic.music.util.JSUtil
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,7 +33,7 @@ class HttpService {
     }
 
     //todo 分页
-    fun applySearchMusic(searchText: String): Single<List<Music>> {
+    fun applySearchMusic(searchText: String): Single<List<MusicVO>> {
         val param = hashMapOf<String, String>()
         param["s"] = searchText
         param["type"] = 1.toString()
@@ -42,7 +45,7 @@ class HttpService {
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode<SearchMusicResponse>())
                 .map { response: SearchMusicResponse ->
-                    response.getMusics()
+                    response.getMusicVO()
                 }
     }
 
@@ -78,19 +81,16 @@ class HttpService {
                 }
     }
 
-    fun applyMusicResource(musicId: Long): Single<Pair<String, String>> {
+    fun applyMusicResource(musicIds: List<Long>): Single<List<MusicResourceBO>> {
         val param = hashMapOf<String, String>()
-        param["id"] = musicId.toString()
-        param["ids"] = "[$musicId]"
+        param["ids"] = "[${musicIds.joinToString(separator = ",")}]"
         param["br"] = 3200000.toString()
 
         return api.musicResource(param)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode<MusicResourceResponse>())
-                .map { response: MusicResourceResponse ->
-                    val result = response.data?.first()
-                    Pair(result?.url ?: "", result?.md5 ?: "")
+                .map {
+                    it.getMusicResourceBOs()
                 }
     }
 
@@ -104,6 +104,45 @@ class HttpService {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode())
+    }
+
+    //todo 分页
+    fun applyArtistHotAlbum(artistId: Long): Single<List<AlbumVO>> {
+        val param = hashMapOf<String, String>()
+        param["offset"] = "0"
+        param["limit"] = "30"
+        param["total"] = "true"
+        //param["csrf_token"] = ""
+
+        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+
+        return api.artistHotAlbum(artistId, encryptParam)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(CheckResponseCode<ArtistHotAlbumResponse>())
+                .map {
+                    it.getAlbumVOs()
+                }
+    }
+
+    fun applyMusicDetail(musicIds: List<Long>): Single<List<Music>> {
+
+        val ids = mutableListOf<MusicDetailParamId>()
+        musicIds.forEach {
+            ids.add(MusicDetailParamId(it))
+        }
+
+        val param = hashMapOf<String, String>()
+        param["c"] = Gson().toJson(ids)
+
+        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+
+        return api.musicDetail(encryptParam)
+                .subscribeOn(Schedulers.io())
+                .compose(CheckResponseCode<MusicDetailResponse>())
+                .map {
+                    it.getMusics()
+                }
     }
 
     fun applyAlbumDetail(albumId: Long): Single<AlbumDetailResponse> {
@@ -129,5 +168,5 @@ class HttpService {
         }
     }
 
-
+    private class MusicDetailParamId(val id: Long)
 }

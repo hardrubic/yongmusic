@@ -13,7 +13,7 @@ import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.command.*
 import com.hardrubic.music.biz.helper.PlayModelHelper
-import com.hardrubic.music.biz.listener.MusicStateListener
+import com.hardrubic.music.biz.interf.MusicStateListener
 import com.hardrubic.music.biz.vm.PlayingViewModel
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.fragment.PlayListFragment

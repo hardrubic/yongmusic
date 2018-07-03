@@ -12,7 +12,7 @@ import com.hardrubic.music.R
 import com.hardrubic.music.aidl.MusicAidl
 import com.hardrubic.music.biz.MusicControl
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
-import com.hardrubic.music.biz.listener.MusicStateListener
+import com.hardrubic.music.biz.interf.MusicStateListener
 import com.hardrubic.music.ui.fragment.MusicControlFragment
 import com.hardrubic.music.util.LogUtil
 import java.lang.ref.WeakReference
@@ -110,7 +110,7 @@ open class BaseActivity : AppCompatActivity() {
                     LogUtil.d("broadcast receive $action:$flag")
                     weakReference.get()?.notifyPlayingState(flag)
                 }
-            //todo add recent
+            //todo addAlbum recent
             }
         }
     }

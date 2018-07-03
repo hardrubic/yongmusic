@@ -8,36 +8,28 @@ import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.command.UpdatePlayListCommand
 import com.hardrubic.music.biz.component.DaggerSearchViewModelComponent
 import com.hardrubic.music.biz.helper.PlayListHelper
-import com.hardrubic.music.biz.repository.AlbumRepository
-import com.hardrubic.music.biz.repository.ArtistRepository
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
+import com.hardrubic.music.biz.resource.MusicDownload
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicResourceBO
+import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.HttpService
-import com.hardrubic.music.util.FileUtil
-import io.reactivex.SingleObserver
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
-import zlc.season.rxdownload3.RxDownload
-import zlc.season.rxdownload3.core.Mission
-import zlc.season.rxdownload3.core.Status
-import zlc.season.rxdownload3.core.Succeed
 import java.util.*
+import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
     @Inject
     lateinit var musicRepository: MusicRepository
     @Inject
     lateinit var recentRepository: RecentRepository
-    @Inject
-    lateinit var artistRepository: ArtistRepository
-    @Inject
-    lateinit var albumRepository: AlbumRepository
 
-    val musicData = MutableLiveData<List<Music>>()
+    val musicData = MutableLiveData<List<MusicVO>>()
     val artistData = MutableLiveData<List<Artist>>()
     val albumData = MutableLiveData<List<Album>>()
 
@@ -50,7 +42,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
             musicData.value = Collections.emptyList()
         } else {
             HttpService.instance.applySearchMusic(searchText)
-                    .subscribe(Consumer<List<Music>> {
+                    .subscribe(Consumer<List<MusicVO>> {
                         musicData.value = it
                     }, errorConsumer)
         }
@@ -78,48 +70,50 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun applyCacheAndPlayMusic(music: Music) {
-        HttpService.instance.applyMusicResource(music.musicId)
-                .subscribe(object : SingleObserver<Pair<String, String>> {
-                    override fun onSubscribe(d: Disposable) {
-                    }
-
-                    override fun onSuccess(pair: Pair<String, String>) {
-                        cacheMusicResource(music, pair.first, pair.second)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        e.printStackTrace()
-                    }
-                })
-
+    fun selectMusic(musicId: Long, errorConsumer: Consumer<Throwable>) {
+        applyMusicDetailAndResource(listOf(musicId), musicId, errorConsumer)
     }
 
-    private fun cacheMusicResource(music: Music, url: String, md5: String) {
-        val savePath = FileUtil.getMusicCacheDir(getApplication())
-        val saveName = md5
+    private fun applyMusicDetailAndResource(musicIds: List<Long>, playMusicId: Long, errorConsumer: Consumer<Throwable>) {
+        val countDownLatch = CountDownLatch(2)
+        thread {
+            var saveMusics = listOf<Music>()
+            var musicResourceBOs = listOf<MusicResourceBO>()
 
-        val mission = Mission(url, saveName, savePath)
-        RxDownload.create(mission, true).subscribe(Consumer<Status> { status ->
-            music.path = savePath + saveName
+            HttpService.instance.applyMusicDetail(musicIds)
+                    .subscribe(Consumer {
+                        saveMusics = it
+                        countDownLatch.countDown()
+                    }, errorConsumer)
 
-            when (status) {
-                is Succeed -> finishCacheMusic(music)
-            }
-        }, Consumer<Throwable> { throwable -> throwable.printStackTrace() })
+            HttpService.instance.applyMusicResource(musicIds)
+                    .subscribe(Consumer {
+                        MusicDownload.downloadSync(getApplication(), it, errorConsumer)
+                        musicResourceBOs = it
+                        countDownLatch.countDown()
+                    }, errorConsumer)
+
+            countDownLatch.await()
+
+            MusicDownload.fillResource2Music(saveMusics, musicResourceBOs)
+            finishCacheMusics(saveMusics, playMusicId)
+        }
     }
 
-    private fun finishCacheMusic(music: Music) {
-        recentRepository.add(music.musicId)
-        musicRepository.add(music)
-        artistRepository.add(music.artists)
-        albumRepository.add(music.album)
+    private fun finishCacheMusics(musics: List<Music>, playMusicId: Long) {
+        musicRepository.addMusic(musics)
+
         //添加到播放列表
-        if (PlayListHelper.add(music)) {
+        if (PlayListHelper.add(musics)) {
             val musics = PlayListHelper.list().mapNotNull { musicRepository.queryMusic(it) }
             RemoteControl.executeCommand(UpdatePlayListCommand(musics))
         }
-        //播放
-        RemoteControl.executeCommand(SelectAndPlayCommand(music))
+
+        //play
+        val playMusic = musicRepository.queryMusic(playMusicId)
+        if (playMusic != null) {
+            recentRepository.add(playMusic.musicId)
+            RemoteControl.executeCommand(SelectAndPlayCommand(playMusic))
+        }
     }
 }

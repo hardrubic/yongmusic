@@ -13,7 +13,7 @@ import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.aidl.MusicAidl
-import com.hardrubic.music.biz.adapter.MusicAidlAdapter
+import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.vm.MainViewModel
@@ -52,11 +52,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (playingMusicId != null) {
             val playingMusic = viewModel.queryMusic(playingMusicId)
             if (playingMusic != null) {
-                intent.putExtra(Constant.Param.CURRENT_MUSIC, MusicAidlAdapter.toMusicAidl(playingMusic))
+                intent.putExtra(Constant.Param.CURRENT_MUSIC, MusicEntityAdapter.toMusicAidl(playingMusic))
             }
         }
 
-        val playList: List<MusicAidl> = PlayListHelper.list().mapNotNull { viewModel.queryMusic(it) }.map { MusicAidlAdapter.toMusicAidl(it) }
+        val playList: List<MusicAidl> = PlayListHelper.list().mapNotNull { viewModel.queryMusic(it) }.map { MusicEntityAdapter.toMusicAidl(it) }
         if (playList.isNotEmpty()) {
             intent.putParcelableArrayListExtra(Constant.Param.LIST, ArrayList<MusicAidl>(playList))
         }
