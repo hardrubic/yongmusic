@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+dependencies {
+    implementation files('libs/jsoup-1.10.3.jar')
+    implementation files('libs/gson-2.8.0.jar')
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
