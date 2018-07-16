@@ -18,6 +18,7 @@ import com.hardrubic.music.biz.vm.MusicControlViewModel
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.activity.BaseActivity
 import com.hardrubic.music.ui.activity.PlayingActivity
+import com.hardrubic.music.util.DrawableUtil
 import com.hardrubic.music.util.FormatUtil
 import com.hardrubic.music.util.LoadImageUtil
 import kotlinx.android.synthetic.main.fragment_music_control.*
@@ -61,6 +62,7 @@ class MusicControlFragment : BaseFragment(), MusicStateListener {
             val fragment = PlayListFragment()
             fragment.show(mActivity.supportFragmentManager, PlayListFragment.TAG)
         }
+        DrawableUtil.setImageViewColor(iv_list, R.color.second_text_color)
 
         RemoteControl.executeCommand(ApplyCurrentMusicCommand())
         RemoteControl.executeCommand(ApplyPlayStateCommand())

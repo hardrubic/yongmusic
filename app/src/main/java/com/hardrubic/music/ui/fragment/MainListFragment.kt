@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DrawableUtils
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import com.hardrubic.music.ui.activity.CollectionDetailActivity
 import com.hardrubic.music.ui.activity.LocalMusicActivity
 import com.hardrubic.music.ui.activity.RecentActivity
 import com.hardrubic.music.ui.adapter.CollectionAdapter
+import com.hardrubic.music.util.DrawableUtil
 import kotlinx.android.synthetic.main.fragment_main_list.*
 import java.util.*
 
@@ -74,6 +76,7 @@ class MainListFragment : Fragment() {
         iv_edit_collection.setOnClickListener {
             Toast.makeText(activity, "todo歌单管理", Toast.LENGTH_SHORT).show()
         }
+        DrawableUtil.setImageViewColor(iv_edit_collection, R.color.second_text_color)
 
         collectionAdapter = CollectionAdapter(Collections.emptyList())
         collectionAdapter.setOnItemClickListener { adapter, view, position ->

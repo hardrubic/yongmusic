@@ -19,6 +19,7 @@ import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.ui.fragment.PlayListFragment
 import com.hardrubic.music.ui.fragment.PlayingMusicMoreDialogFragment
 import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
+import com.hardrubic.music.util.DrawableUtil
 import com.hardrubic.music.util.FormatUtil
 import com.hardrubic.music.util.LoadImageUtil
 import kotlinx.android.synthetic.main.activity_playing.*
@@ -82,6 +83,7 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
             val fragment = PlayListFragment()
             fragment.show(supportFragmentManager, PlayListFragment.TAG)
         }
+        DrawableUtil.setImageViewColor(iv_list, R.color.white)
         iv_play_model.setOnClickListener {
             changePlayModel()
         }

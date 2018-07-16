@@ -64,9 +64,9 @@
     <ImageView
         android:id="@+id/iv_list"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
-        android:src="@mipmap/ic_play_list_black"
+        android:src="@mipmap/ic_play_list"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
