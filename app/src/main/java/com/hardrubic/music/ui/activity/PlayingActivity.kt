@@ -23,7 +23,7 @@ import com.hardrubic.music.util.FormatUtil
 import com.hardrubic.music.util.LoadImageUtil
 import kotlinx.android.synthetic.main.activity_playing.*
 
-class PlayingActivity : BaseActivity(), MusicStateListener {
+class PlayingActivity : BaseActivity() {
 
     private var movingProgress = false
     private var love: Boolean? = null
@@ -41,7 +41,7 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
     }
 
     private fun initData() {
-        addMusicStateListener(this)
+        addMusicStateListener(musicStateListener)
     }
 
     private fun initView() {
@@ -121,31 +121,6 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
         Toast.makeText(this, getString(stringId), Toast.LENGTH_SHORT).show()
     }
 
-    override fun updateProgress(progress: Int) {
-        if (movingProgress) {
-            return
-        }
-        sb_progress.progress = progress
-        tv_position.text = FormatUtil.formatDuration(progress.toLong())
-    }
-
-    override fun updateCurrentMusic(musicId: Long) {
-        val music = viewModel.queryMusic(musicId) ?: return
-        viewModel.playingMusic = music
-
-        supportActionBar!!.title = music.name
-        supportActionBar!!.subtitle = FormatUtil.formatArtistNames(music.artistNames)
-        sb_progress.max = music.duration
-        tv_duration.text = FormatUtil.formatDuration(music.duration.toLong())
-
-        if (love == null) {
-            love = viewModel.isMusicLove(music.musicId)
-            updateLoveState(love!!)
-        }
-
-        updateCover(music)
-    }
-
     private fun updateCover(music: Music) {
         val albumId = music.albumId ?: return
 
@@ -153,14 +128,6 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
 
         if (!TextUtils.isEmpty(album.picUrl)) {
             LoadImageUtil.loadFromNetwork(this, album.picUrl, iv_cover)
-        }
-    }
-
-    override fun updatePlayingState(flag: Boolean) {
-        if (flag) {
-            iv_play.setImageResource(android.R.drawable.ic_media_pause)
-        } else {
-            iv_play.setImageResource(android.R.drawable.ic_media_play)
         }
     }
 
@@ -180,6 +147,44 @@ class PlayingActivity : BaseActivity(), MusicStateListener {
         collection?.let {
             val msg = getString(R.string.hint_add_music_to_collection_success, collection.name)
             Snackbar.make(sb_progress, msg, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private val musicStateListener = object:MusicStateListener{
+        override fun updateProgress(progress: Int) {
+            if (movingProgress) {
+                return
+            }
+            sb_progress.progress = progress
+            tv_position.text = FormatUtil.formatDuration(progress.toLong())
+        }
+
+        override fun updateCurrentMusic(musicId: Long) {
+            val music = viewModel.queryMusic(musicId) ?: return
+            viewModel.playingMusic = music
+
+            supportActionBar!!.title = music.name
+            supportActionBar!!.subtitle = FormatUtil.formatArtistNames(music.artistNames)
+            sb_progress.max = music.duration
+            tv_duration.text = FormatUtil.formatDuration(music.duration.toLong())
+
+            if (love == null) {
+                love = viewModel.isMusicLove(music.musicId)
+                updateLoveState(love!!)
+            }
+
+            iv_cover.resetRotate()
+            updateCover(music)
+        }
+
+        override fun updatePlayingState(flag: Boolean) {
+            if (flag) {
+                iv_play.setImageResource(android.R.drawable.ic_media_pause)
+                iv_cover.startRotate()
+            } else {
+                iv_play.setImageResource(android.R.drawable.ic_media_play)
+                iv_cover.pauseRotate()
+            }
         }
     }
 
