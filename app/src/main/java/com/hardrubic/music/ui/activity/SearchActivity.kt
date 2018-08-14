@@ -12,6 +12,7 @@ import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.search.SearchAlbumListFragment
 import com.hardrubic.music.ui.fragment.search.SearchArtistListFragment
 import com.hardrubic.music.ui.fragment.search.SearchMusicListFragment
+import com.hardrubic.music.util.LoadingDialogUtil
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_search.*
@@ -49,20 +50,19 @@ class SearchActivity : BaseActivity() {
             addFragment(SearchAlbumListFragment(), getString(R.string.album))
         }
         tab.tabMode = TabLayout.MODE_FIXED
+        tab.setupWithViewPager(vp_list)
         tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                applySearch(searchView.text.trim().toString())
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
-
+                LoadingDialogUtil.getInstance().showProgressDialog(this@SearchActivity)
+                applySearch(searchView.text.trim().toString())
             }
-
         })
-        tab.setupWithViewPager(vp_list)
 
         RxTextView.textChanges(searchView)
                 .throttleLast(500, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())

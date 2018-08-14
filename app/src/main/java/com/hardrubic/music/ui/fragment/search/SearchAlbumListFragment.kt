@@ -15,6 +15,7 @@ import com.hardrubic.music.biz.vm.SearchViewModel
 import com.hardrubic.music.ui.activity.AlbumDetailActivity
 import com.hardrubic.music.ui.adapter.AlbumListAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
+import com.hardrubic.music.util.LoadingDialogUtil
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
@@ -51,6 +52,7 @@ class SearchAlbumListFragment : BaseFragment(), Searchable {
     private fun initData() {
         viewModel.albumData.observe(this, android.arch.lifecycle.Observer {
             adapter.setNewData(it)
+            LoadingDialogUtil.getInstance().dismissLoadingDialog()
         })
     }
 
