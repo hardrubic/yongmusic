@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="url">
+        <item>
+            http://img.jammyfm.com/wordpress/wp-content/uploads/2016/07/201607150021499091.jpg?x-oss-process=style/750
+        </item>
+        <item>
+            http://img.jammyfm.com/wordpress/wp-content/uploads/2016/07/201607150021515290.jpg?x-oss-process=style/750
+        </item>
+        <item>
+            http://img.jammyfm.com/wordpress/wp-content/uploads/2016/07/201607150032435302.jpg?x-oss-process=style/750
+        </item>
+        <item>
+            http://img.jammyfm.com/wordpress/wp-content/uploads/2016/07/201607150036262543.jpg?x-oss-process=style/750
+        </item>
+        <item>
+            http://img.jammyfm.com/wordpress/wp-content/uploads/2016/07/201607150032415717.jpg?x-oss-process=style/750
+        </item>
+    </array>
+</resources>
