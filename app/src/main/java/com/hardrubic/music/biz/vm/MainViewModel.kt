@@ -6,6 +6,7 @@ import com.hardrubic.music.Constant
 import com.hardrubic.music.biz.component.DaggerMainViewModelComponent
 import com.hardrubic.music.biz.repository.CollectionRepository
 import com.hardrubic.music.biz.repository.MusicRepository
+import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Collection
 import com.hardrubic.music.db.dataobject.Music
 import javax.inject.Inject
@@ -16,6 +17,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var musicRepository: MusicRepository
     @Inject
     lateinit var collectionRepository: CollectionRepository
+    @Inject
+    lateinit var recentRepository: RecentRepository
 
 
     init {
@@ -45,6 +48,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun queryLocalMusicNum(): Int {
         return musicRepository.queryLocalMusic().size
+    }
+
+    fun queryRecentNum(): Int {
+        return recentRepository.queryRecentMusics().size
     }
 
     fun addCollection(name: String, id: Long? = null) {

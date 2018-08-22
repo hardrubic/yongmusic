@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.widget.SeekBar
 import android.widget.Toast
@@ -13,9 +14,9 @@ import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.command.*
 import com.hardrubic.music.biz.helper.PlayModelHelper
-import com.hardrubic.music.biz.interf.MusicStateListener
 import com.hardrubic.music.biz.vm.PlayingViewModel
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.service.MusicServiceControl
 import com.hardrubic.music.ui.fragment.PlayListFragment
 import com.hardrubic.music.ui.fragment.PlayingMusicMoreDialogFragment
 import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
@@ -24,8 +25,9 @@ import com.hardrubic.music.util.FormatUtil
 import com.hardrubic.music.util.LoadImageUtil
 import kotlinx.android.synthetic.main.activity_playing.*
 
-class PlayingActivity : BaseActivity() {
+class PlayingActivity : AppCompatActivity() {
 
+    private val musicServiceControl = MusicServiceControl()
     private var movingProgress = false
     private var love: Boolean? = null
 
@@ -37,12 +39,20 @@ class PlayingActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
 
-        initData()
         initView()
     }
 
-    private fun initData() {
-        addMusicStateListener(musicStateListener)
+    override fun onStart() {
+        super.onStart()
+        musicServiceControl.register(this, musicBroadcastListener) {
+            RemoteControl.executeCommand(ApplyCurrentMusicCommand(musicServiceControl))
+            RemoteControl.executeCommand(ApplyPlayStateCommand(musicServiceControl))
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        musicServiceControl.unregister(this)
     }
 
     private fun initView() {
@@ -71,13 +81,17 @@ class PlayingActivity : BaseActivity() {
         }
 
         iv_previous.setOnClickListener {
-            viewModel.previousMusic()
+            viewModel.previousMusic(musicServiceControl)
         }
         iv_next.setOnClickListener {
-            viewModel.nextMusic()
+            viewModel.nextMusic(musicServiceControl)
         }
         iv_play.setOnClickListener {
-            RemoteControl.executeCommand(PlayOrPauseCommand())
+            if (musicServiceControl.isPlaying()) {
+                RemoteControl.executeCommand(PauseCommand(musicServiceControl))
+            } else {
+                RemoteControl.executeCommand(PlayCommand(musicServiceControl))
+            }
         }
         iv_list.setOnClickListener {
             val fragment = PlayListFragment()
@@ -101,21 +115,18 @@ class PlayingActivity : BaseActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 movingProgress = false
-                RemoteControl.executeCommand(SeekToCommand(seekBar!!.progress))
+                RemoteControl.executeCommand(SeekToCommand(seekBar!!.progress, musicServiceControl))
             }
         })
 
         val model = PlayModelHelper.loadPlayModel()
         iv_play_model.setImageDrawable(getDrawable(PlayModelHelper.getPlayModelIconId(model)))
-
-        RemoteControl.executeCommand(ApplyCurrentMusicCommand())
-        RemoteControl.executeCommand(ApplyPlayStateCommand())
     }
 
     private fun changePlayModel() {
         val currentPlayModel = PlayModelHelper.loadPlayModel()
         val nextPlayModel = PlayModelHelper.nextPlayModel(currentPlayModel)
-        PlayModelHelper.savePlayModel(nextPlayModel)
+        RemoteControl.executeCommand(LoopCommand(nextPlayModel, musicServiceControl))
 
         val iconId = PlayModelHelper.getPlayModelIconId(nextPlayModel)
         val stringId = PlayModelHelper.getPlayModelStringId(nextPlayModel)
@@ -152,8 +163,8 @@ class PlayingActivity : BaseActivity() {
         }
     }
 
-    private val musicStateListener = object:MusicStateListener{
-        override fun updateProgress(progress: Int) {
+    private val musicBroadcastListener = object : MusicServiceControl.MusicBroadcastListener {
+        override fun onProgress(progress: Int) {
             if (movingProgress) {
                 return
             }
@@ -161,7 +172,7 @@ class PlayingActivity : BaseActivity() {
             tv_position.text = FormatUtil.formatDuration(progress.toLong())
         }
 
-        override fun updateCurrentMusic(musicId: Long) {
+        override fun onCurrentMusicId(musicId: Long) {
             val music = viewModel.queryMusic(musicId) ?: return
             viewModel.playingMusic = music
 
@@ -179,7 +190,7 @@ class PlayingActivity : BaseActivity() {
             updateCover(music)
         }
 
-        override fun updatePlayingState(flag: Boolean) {
+        override fun onPlayState(flag: Boolean) {
             if (flag) {
                 iv_play.setImageResource(android.R.drawable.ic_media_pause)
                 iv_cover.startRotate()

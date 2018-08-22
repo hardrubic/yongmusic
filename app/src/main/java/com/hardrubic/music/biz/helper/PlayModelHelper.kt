@@ -2,8 +2,6 @@ package com.hardrubic.music.biz.helper
 
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.command.LoopCommand
-import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.util.PreferencesUtil
 
 object PlayModelHelper {
@@ -12,8 +10,7 @@ object PlayModelHelper {
         return PreferencesUtil.instance.getInt(Constant.SpKey.PLAY_MODEL, Constant.PlayModel.LIST)
     }
 
-    fun savePlayModel(model: Int) {
-        RemoteControl.executeCommand(LoopCommand(model))
+    fun updatePlayModel(model: Int) {
         PreferencesUtil.instance.putInt(Constant.SpKey.PLAY_MODEL, model)
     }
 

@@ -1,6 +1,6 @@
 package com.hardrubic.music.biz.adapter
 
-import com.hardrubic.music.aidl.MusicAidl
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.entity.vo.MusicVO
 

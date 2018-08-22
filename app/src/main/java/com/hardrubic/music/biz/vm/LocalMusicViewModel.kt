@@ -8,15 +8,15 @@ import android.provider.MediaStore
 import com.hardrubic.music.Constant.Companion.LOCAL_MUSIC_MINIMUM_SECOND
 import com.hardrubic.music.Constant.Companion.LOCAL_MUSIC_MINIMUM_SIZE
 import com.hardrubic.music.biz.adapter.MusicEntityAdapter
+import com.hardrubic.music.biz.command.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
-import com.hardrubic.music.biz.command.UpdatePlayListCommand
 import com.hardrubic.music.biz.component.DaggerLocalMusicViewModelComponent
-import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.entity.vo.MusicVO
+import com.hardrubic.music.service.MusicServiceControl
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Consumer
@@ -63,17 +63,13 @@ class LocalMusicViewModel(application: Application) : AndroidViewModel(applicati
 
     fun selectMusic(musicIds: List<Long>, playMusicId: Long = musicIds.first()) {
         val musics = musicRepository.queryMusic(musicIds)
-
-        //添加到播放列表
-        if (PlayListHelper.add(musics)) {
-            RemoteControl.executeCommand(UpdatePlayListCommand(musics))
-        }
-
-        //play
         val playMusic = musicRepository.queryMusic(playMusicId)
-        if (playMusic != null) {
-            recentRepository.add(playMusic.musicId)
-            RemoteControl.executeCommand(SelectAndPlayCommand(playMusic))
+
+        MusicServiceControl.runInMusicService(getApplication()) {
+            RemoteControl.executeCommand(AddMusicsCommand(musics, musicRepository, it))
+            if (playMusic != null) {
+                RemoteControl.executeCommand(SelectAndPlayCommand(playMusic, recentRepository, it))
+            }
         }
     }
 

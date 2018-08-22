@@ -19,7 +19,6 @@ class Constant {
         const val MUSIC_ID = "MUSIC_ID"
         const val ARTIST_ID = "ARTIST_ID"
         const val ALBUM_ID = "ALBUM_ID"
-        const val MUSIC_LIST = "MUSIC_LIST"
     }
 
     object RequestCode {

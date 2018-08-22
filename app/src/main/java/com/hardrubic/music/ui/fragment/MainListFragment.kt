@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DrawableUtils
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +44,7 @@ class MainListFragment : Fragment() {
         ll_local.setOnClickListener {
             startActivity(Intent(activity, LocalMusicActivity::class.java))
         }
-        tv_recent.setOnClickListener {
+        ll_recent.setOnClickListener {
             startActivity(Intent(activity, RecentActivity::class.java))
         }
         ll_love.setOnClickListener {
@@ -92,9 +91,9 @@ class MainListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        //todo async
         tv_love_num.text = getString(R.string.num_with_bracket, viewModel.queryLoveCollectionMusicNum())
         tv_local_num.text = getString(R.string.num_with_bracket, viewModel.queryLocalMusicNum())
+        tv_recent_num.text = getString(R.string.num_with_bracket, viewModel.queryRecentNum())
         refreshCollectionList()
     }
 

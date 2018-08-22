@@ -1,10 +1,10 @@
 package com.hardrubic.music.biz.command
 
-import com.hardrubic.music.biz.MusicControl
+import com.hardrubic.music.service.MusicServiceControl
 
-class PreviousCommand() : Command {
+class PreviousCommand(private val musicServiceControl: MusicServiceControl) : Command {
     override fun execute() {
-        MusicControl.instance.applyPrevious()
+        musicServiceControl.applyPrevious()
     }
 
 }

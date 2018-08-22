@@ -1,10 +1,12 @@
 package com.hardrubic.music.biz.command
 
-import com.hardrubic.music.biz.MusicControl
+import com.hardrubic.music.biz.helper.PlayModelHelper
+import com.hardrubic.music.service.MusicServiceControl
 
-class LoopCommand(private val playModel:Int) : Command {
+class LoopCommand(private val playModel: Int, private val musicServiceControl: MusicServiceControl) : Command {
     override fun execute() {
-        MusicControl.instance.applyPlayModel(playModel)
+        PlayModelHelper.updatePlayModel(playModel)
+        musicServiceControl.applyUpdatePlayModel(playModel)
     }
 
 }

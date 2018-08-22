@@ -11,16 +11,8 @@ class RecentRepository @Inject constructor() {
     private val recentDao: RecentDao
         get() = DbManager.instance.session.recentDao
 
-    fun query(musicId: Long): Recent? {
+    private fun query(musicId: Long): Recent? {
         return recentDao.load(musicId)
-    }
-
-    fun queryRecent(): Music? {
-        val recents = queryRecentMusics()
-        if (recents.isNotEmpty()) {
-            return recents.first()
-        }
-        return null
     }
 
     fun queryRecentMusics(): List<Music> {

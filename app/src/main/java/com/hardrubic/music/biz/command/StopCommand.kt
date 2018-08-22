@@ -1,10 +1,10 @@
 package com.hardrubic.music.biz.command
 
-import com.hardrubic.music.biz.MusicControl
+import com.hardrubic.music.service.MusicServiceControl
 
-class StopCommand : Command {
+class StopCommand(private val musicServiceControl: MusicServiceControl) : Command {
     override fun execute() {
-        MusicControl.instance.applyStop()
+        musicServiceControl.applyStop()
     }
 
 }

@@ -1,6 +1,6 @@
-package com.hardrubic.music.aidl;
+package com.hardrubic.music;
 
-import com.hardrubic.music.aidl.MusicAidl;
+import com.hardrubic.music.entity.aidl.MusicAidl;
 
 interface MusicManager {
     void play();
@@ -19,11 +19,11 @@ interface MusicManager {
 
     void select(in MusicAidl music);
 
-    void playList(in List<MusicAidl> musics);
+    void musics(in List<MusicAidl> musics);
+
+    void updatePlayModel(int playModel);
 
     void applyCurrentMusic();
 
     void applyPlayState();
-
-    void applyPlayModel(int playModel);
 }

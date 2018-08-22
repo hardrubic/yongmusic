@@ -1,11 +1,10 @@
 package com.hardrubic.music.biz.command
 
-import com.hardrubic.music.biz.MusicControl
-import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.service.MusicServiceControl
 
-class ApplyPlayStateCommand : Command {
+class ApplyPlayStateCommand(private val musicServiceControl: MusicServiceControl) : Command {
     override fun execute() {
-        MusicControl.instance.applyPlayState()
+        musicServiceControl.applyPlayState()
     }
 
 }

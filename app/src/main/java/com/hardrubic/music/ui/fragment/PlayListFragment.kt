@@ -10,7 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.MusicControl
+import com.hardrubic.music.biz.command.LoopCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.StopCommand
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
@@ -18,6 +18,7 @@ import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.helper.PlayModelHelper
 import com.hardrubic.music.biz.vm.PlayListViewModel
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.service.MusicServiceControl
 import com.hardrubic.music.ui.adapter.PlayListAdapter
 import kotlinx.android.synthetic.main.fragment_play_list.*
 import java.util.*
@@ -98,8 +99,11 @@ class PlayListFragment : AppCompatDialogFragment() {
         if (adapter.itemCount == 1) {
             deleteAllMusic()
         } else {
-            if (adapter.playingMusicId == music.musicId
-                    && MusicControl.instance.isPlaying()) {
+            var playing = false
+            MusicServiceControl.runInMusicService(activity!!, {
+                playing = it.isPlaying()
+            })
+            if (adapter.playingMusicId == music.musicId && playing) {
                 val nextMusicPosition = if (position == adapter.data.lastIndex) {
                     0
                 } else {
@@ -117,13 +121,19 @@ class PlayListFragment : AppCompatDialogFragment() {
         adapter.setNewData(Collections.emptyList())
         PlayListHelper.deleteAll()
         CurrentPlayingHelper.setPlayingMusicId(null)
-        RemoteControl.executeCommand(StopCommand())
+
+        MusicServiceControl.runInMusicService(activity!!) {
+            RemoteControl.executeCommand(StopCommand(it))
+        }
     }
 
     private fun changePlayModel() {
         val currentPlayModel = PlayModelHelper.loadPlayModel()
         val nextPlayModel = PlayModelHelper.nextPlayModel(currentPlayModel)
-        PlayModelHelper.savePlayModel(nextPlayModel)
+
+        MusicServiceControl.runInMusicService(activity!!) {
+            RemoteControl.executeCommand(LoopCommand(nextPlayModel, it))
+        }
 
         loadPlayModelNameAndIcon(nextPlayModel)
     }

@@ -4,8 +4,8 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import com.hardrubic.music.Constant
-import com.hardrubic.music.aidl.MusicAidl
-import com.hardrubic.music.aidl.MusicManager
+import com.hardrubic.music.MusicManager
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.biz.player.SeamlessMediaPlayer
 import com.hardrubic.music.util.LogUtil
 import java.util.concurrent.Executors
@@ -29,78 +29,80 @@ class MusicService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        LogUtil.d("music service create")
+        LogUtil.d("MusicService:create")
 
         initMediaPlayer()
-        sendProgressSchedule()
+        initProgressSchedule()
     }
 
     private fun initMediaPlayer() {
         mediaPlayer = SeamlessMediaPlayer()
-        mediaPlayer.currentMusicLiveData.observeForever { music ->
+        mediaPlayer.currentMusicData.observeForever { music ->
             music?.let {
                 sendCurrentMusic(it)
             }
         }
-        mediaPlayer.playStateLiveData.observeForever { flag ->
+        mediaPlayer.playStateData.observeForever { flag ->
             sendPlayState(flag ?: false)
         }
     }
 
+    private fun initProgressSchedule() {
+        val delay = 0L
+        val period = 1L
+        scheduledExecutorService.scheduleAtFixedRate({
+            sendProgress()
+        }, delay, period, TimeUnit.SECONDS)
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        LogUtil.d("music service start command")
+        LogUtil.d("MusicService:onStartCommand")
 
         //初始化默认参数
         intent?.let {
-            val playList: List<MusicAidl>? = it.getParcelableArrayListExtra(Constant.Param.LIST)
-            if (playList != null && playList.isNotEmpty()) {
-                mediaPlayer.musicDispatch.updateMusics(playList)
+            val musics: List<MusicAidl>? = it.getParcelableArrayListExtra(Constant.Param.LIST)
+            if (musics != null && musics.isNotEmpty()) {
+                mediaPlayer.updateMusics(musics)
             }
 
             val playingMusic = it.getParcelableExtra<MusicAidl>(Constant.Param.CURRENT_MUSIC)
             if (playingMusic != null) {
                 mediaPlayer.select(playingMusic)
-                sendCurrentMusic(playingMusic)
-                sendPlayState(false)
+                //TODO
+                //sendCurrentMusic(playingMusic)
+                //sendPlayState(false)
             }
 
             val playModel = it.getIntExtra(Constant.Param.PLAY_MODEL, Constant.PlayModel.LIST)
-            mediaPlayer.updatePlayModel(playModel)
+            internalUpdatePlayModel(playModel)
         }
 
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        LogUtil.d("music service bind")
+        LogUtil.d("MusicService:onBind")
         return musicManager
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        LogUtil.d("music service unbind")
+        LogUtil.d("MusicService:onUnbind")
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-        LogUtil.d("music service destroy")
-
-        //todo remove LiveData observer
-
+        LogUtil.d("MusicService:onDestroy")
         scheduledExecutorService.shutdownNow()
         mediaPlayer.destroy()
+        super.onDestroy()
     }
 
-    private fun sendProgressSchedule() {
-        val delay = 0L
-        val period = 1L
-        scheduledExecutorService.scheduleAtFixedRate({
-            if (mediaPlayer.isPlaying()) {
-                val intent = Intent(Constant.BroadcastAction.PROGRESS)
-                intent.putExtra(Constant.Param.PROGRESS, mediaPlayer.position())
-                sendBroadcast(intent)
-            }
-        }, delay, period, TimeUnit.SECONDS)
+    private fun sendProgress() {
+        if (mediaPlayer.isPlaying()) {
+            val intent = Intent(Constant.BroadcastAction.PROGRESS)
+            intent.putExtra(Constant.Param.PROGRESS, mediaPlayer.position())
+            sendBroadcast(intent)
+        }
     }
 
     private fun sendCurrentMusic(music: MusicAidl) {
@@ -118,16 +120,20 @@ class MusicService : Service() {
     }
 
     private inner class MusicManagerImpl : MusicManager.Stub() {
-        override fun applyPlayModel(playModel: Int) {
-            mediaPlayer.updatePlayModel(playModel)
+        override fun musics(musics: MutableList<MusicAidl>) {
+            internalUpdateMusics(musics)
+        }
+
+        override fun updatePlayModel(playModel: Int) {
+            internalUpdatePlayModel(playModel)
         }
 
         override fun applyPlayState() {
-            sendPlayState(mediaPlayer.playStateLiveData.value ?: false)
+            sendPlayState(mediaPlayer.playStateData.value ?: false)
         }
 
         override fun applyCurrentMusic() {
-            val currentMusic = mediaPlayer.currentMusicLiveData.value
+            val currentMusic = mediaPlayer.currentMusicData.value
             currentMusic?.let {
                 sendCurrentMusic(currentMusic)
             }
@@ -145,18 +151,12 @@ class MusicService : Service() {
             mediaPlayer.select(music)
         }
 
-        override fun playList(musics: MutableList<MusicAidl>) {
-            mediaPlayer.musicDispatch.updateMusics(musics)
-        }
-
         override fun seekTo(position: Int) {
             mediaPlayer.seekTo(position)
         }
 
         override fun stop() {
             mediaPlayer.stop()
-
-            //todo 反馈无音乐到界面
         }
 
         override fun isPlaying(): Boolean {
@@ -170,5 +170,13 @@ class MusicService : Service() {
         override fun pause() {
             mediaPlayer.pause()
         }
+    }
+
+    private fun internalUpdatePlayModel(playModel: Int) {
+        mediaPlayer.updatePlayModel(playModel)
+    }
+
+    private fun internalUpdateMusics(musics: List<MusicAidl>) {
+        mediaPlayer.updateMusics(musics)
     }
 }

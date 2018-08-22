@@ -12,7 +12,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
-import com.hardrubic.music.aidl.MusicAidl
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayListHelper
@@ -25,7 +25,6 @@ import com.hardrubic.music.util.PreferencesUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.*
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 

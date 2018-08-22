@@ -1,21 +1,26 @@
 package com.hardrubic.music.biz.vm
 
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.text.TextUtils
 import com.hardrubic.music.Constant
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.component.DaggerPlayListViewModelComponent
 import com.hardrubic.music.biz.repository.MusicRepository
+import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.service.MusicServiceControl
 import com.hardrubic.music.util.PreferencesUtil
 import java.util.*
 import javax.inject.Inject
 
-class PlayListViewModel : ViewModel() {
+class PlayListViewModel(application: Application) : AndroidViewModel(application) {
     @Inject
     lateinit var musicRepository: MusicRepository
+    @Inject
+    lateinit var recentRepository: RecentRepository
     val playListData = MutableLiveData<List<Music>>()
 
     init {
@@ -33,7 +38,9 @@ class PlayListViewModel : ViewModel() {
     }
 
     fun selectMusic(music: Music) {
-        RemoteControl.executeCommand(SelectAndPlayCommand(music))
+        MusicServiceControl.runInMusicService(getApplication()) {
+            RemoteControl.executeCommand(SelectAndPlayCommand(music, recentRepository, it))
+        }
     }
 
 }

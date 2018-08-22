@@ -7,11 +7,14 @@ import com.hardrubic.music.biz.command.NextCommand
 import com.hardrubic.music.biz.command.PreviousCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.component.DaggerPlayingViewModelComponent
-import com.hardrubic.music.biz.repository.*
+import com.hardrubic.music.biz.repository.CollectionRepository
+import com.hardrubic.music.biz.repository.MusicRepository
+import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Collection
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.service.MusicServiceControl
 import javax.inject.Inject
 
 class PlayingViewModel(application: Application) : AndroidViewModel(application) {
@@ -36,13 +39,12 @@ class PlayingViewModel(application: Application) : AndroidViewModel(application)
         return musicRepository.queryMusic(musicId)
     }
 
-    fun previousMusic() {
-        val preMusic = recentRepository.queryRecent() ?: return
-        RemoteControl.executeCommand(PreviousCommand())
+    fun previousMusic(musicServiceControl: MusicServiceControl) {
+        RemoteControl.executeCommand(PreviousCommand(musicServiceControl))
     }
 
-    fun nextMusic() {
-        RemoteControl.executeCommand(NextCommand())
+    fun nextMusic(musicServiceControl: MusicServiceControl) {
+        RemoteControl.executeCommand(NextCommand(musicServiceControl))
     }
 
     fun isMusicLove(musicId: Long): Boolean {

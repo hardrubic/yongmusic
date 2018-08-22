@@ -3,11 +3,10 @@ package com.hardrubic.music.biz.vm
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
+import com.hardrubic.music.biz.command.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
-import com.hardrubic.music.biz.command.UpdatePlayListCommand
 import com.hardrubic.music.biz.component.DaggerSearchViewModelComponent
-import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.biz.resource.MusicDownload
@@ -17,6 +16,7 @@ import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.entity.bo.MusicResourceBO
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.HttpService
+import com.hardrubic.music.service.MusicServiceControl
 import io.reactivex.functions.Consumer
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -102,18 +102,13 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun finishCacheMusics(musics: List<Music>, playMusicId: Long) {
         musicRepository.addMusic(musics)
-
-        //添加到播放列表
-        if (PlayListHelper.add(musics)) {
-            val musics = PlayListHelper.list().mapNotNull { musicRepository.queryMusic(it) }
-            RemoteControl.executeCommand(UpdatePlayListCommand(musics))
-        }
-
-        //play
         val playMusic = musicRepository.queryMusic(playMusicId)
-        if (playMusic != null) {
-            recentRepository.add(playMusic.musicId)
-            RemoteControl.executeCommand(SelectAndPlayCommand(playMusic))
+
+        MusicServiceControl.runInMusicService(getApplication()) {
+            RemoteControl.executeCommand(AddMusicsCommand(musics, musicRepository, it))
+            if (playMusic != null) {
+                RemoteControl.executeCommand(SelectAndPlayCommand(playMusic, recentRepository, it))
+            }
         }
     }
 }

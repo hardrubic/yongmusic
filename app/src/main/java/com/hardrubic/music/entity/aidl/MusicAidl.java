@@ -1,4 +1,4 @@
-package com.hardrubic.music.aidl;
+package com.hardrubic.music.entity.aidl;
 
 import android.os.Parcel;
 import android.os.Parcelable;

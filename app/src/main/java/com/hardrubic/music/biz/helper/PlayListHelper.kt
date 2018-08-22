@@ -24,14 +24,11 @@ object PlayListHelper {
             return false
         }
 
-        val result = mutableListOf<String>()
-        if (existIds.isEmpty()) {
-            result.addAll(addIds)
-        } else {
+        val result = mutableSetOf<String>()
+        if (existIds.isNotEmpty()) {
             result.addAll(existIds)
-            addIds.removeAll(existIds)
-            result.addAll(addIds)
         }
+        result.addAll(addIds)
 
         PreferencesUtil.instance.putString(Constant.SpKey.PLAY_LIST, TextUtils.join(",", result))
         return true
@@ -47,7 +44,7 @@ object PlayListHelper {
     }
 
     fun delete(music: Music) {
-        val existIdsStr: String = PreferencesUtil.instance.getString(Constant.SpKey.PLAY_LIST) ?: return
+        val existIdsStr: String = PreferencesUtil.instance.getString(Constant.SpKey.PLAY_LIST)
         val existIds = existIdsStr.split(",").toMutableList()
 
         if (existIds.remove(music.musicId.toString())) {
@@ -60,8 +57,7 @@ object PlayListHelper {
     }
 
     fun list(): List<Long> {
-        val exist: String = PreferencesUtil.instance.getString(Constant.SpKey.PLAY_LIST) ?: return listOf()
-
+        val exist: String = PreferencesUtil.instance.getString(Constant.SpKey.PLAY_LIST)
         return exist.split(",").filter { it != "" }.map { it.toLong() }
     }
 }
