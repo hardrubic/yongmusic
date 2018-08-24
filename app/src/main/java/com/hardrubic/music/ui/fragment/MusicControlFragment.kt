@@ -39,7 +39,7 @@ class MusicControlFragment : BaseFragment() {
 
     override fun onStart() {
         super.onStart()
-        musicServiceControl.register(mActivity, musicBroadcastListener){
+        musicServiceControl.register(mActivity, musicBroadcastListener) {
             RemoteControl.executeCommand(ApplyCurrentMusicCommand(musicServiceControl))
             RemoteControl.executeCommand(ApplyPlayStateCommand(musicServiceControl))
         }
@@ -76,13 +76,16 @@ class MusicControlFragment : BaseFragment() {
     }
 
     private fun updateCover(music: Music) {
-        val albumId = music.albumId ?: return
-
-        val album = viewModel.queryAlbum(albumId) ?: return
-
-        if (!TextUtils.isEmpty(album.picUrl)) {
-            LoadImageUtil.loadFromNetwork(mActivity, album.picUrl, iv_cover)
+        val albumId = music.albumId
+        if (albumId != null) {
+            val album = viewModel.queryAlbum(albumId)
+            if (album != null && !TextUtils.isEmpty(album.picUrl)) {
+                LoadImageUtil.loadFromNetwork(mActivity, album.picUrl, iv_cover)
+                return
+            }
         }
+
+        iv_cover.setImageResource(R.mipmap.ic_empty_cover)
     }
 
     private val musicBroadcastListener = object : MusicServiceControl.MusicBroadcastListener {

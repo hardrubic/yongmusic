@@ -3,6 +3,7 @@ package com.hardrubic.music.ui.fragment.search
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,15 @@ import android.view.ViewGroup
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
 import com.hardrubic.music.biz.interf.DialogBtnListener
+import com.hardrubic.music.biz.interf.MusicResourceListener
 import com.hardrubic.music.biz.interf.Searchable
+import com.hardrubic.music.biz.resource.MusicResourceDownload
 import com.hardrubic.music.biz.vm.SearchViewModel
+import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
+import com.hardrubic.music.ui.fragment.ProgressDialogFragment
 import com.hardrubic.music.util.LoadingDialogUtil
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
@@ -41,19 +47,38 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
         adapter = ShowMusicAdapter(Collections.emptyList())
         adapter.setOnItemClickListener { adapter, view, position ->
             val musicVO = (adapter as ShowMusicAdapter).getItem(position)!!
-
-            viewModel.selectMusic(musicVO.musicId, Consumer {
-                ShowExceptionHelper.show(mActivity, it)
-            })
+            applySelectMusic(musicVO)
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
+        rv_list.addItemDecoration(DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL))
     }
 
     private fun initData() {
         viewModel.musicData.observe(this, android.arch.lifecycle.Observer {
             adapter.setNewData(it)
             LoadingDialogUtil.getInstance().dismissLoadingDialog()
+        })
+    }
+
+    private fun applySelectMusic(musicVO: MusicVO) {
+        val progressDialogFragment = ProgressDialogFragment()
+        progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
+
+        MusicResourceDownload.downloadMusicResource(mActivity, listOf(musicVO.musicId), object : MusicResourceListener {
+            override fun onProgress(progress: Int, max: Int) {
+                progressDialogFragment.refreshProgress(progress, max)
+            }
+
+            override fun onSuccess(musics: List<Music>) {
+                viewModel.saveMusics(musics)
+                viewModel.playMusics(musics, musics.first().musicId)
+                progressDialogFragment.dismiss()
+            }
+
+            override fun onError(e: Throwable) {
+                ShowExceptionHelper.show(mActivity, e)
+            }
         })
     }
 

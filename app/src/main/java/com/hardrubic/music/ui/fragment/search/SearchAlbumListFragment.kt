@@ -3,6 +3,7 @@ package com.hardrubic.music.ui.fragment.search
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -47,6 +48,7 @@ class SearchAlbumListFragment : BaseFragment(), Searchable {
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
+        rv_list.addItemDecoration(DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL))
     }
 
     private fun initData() {

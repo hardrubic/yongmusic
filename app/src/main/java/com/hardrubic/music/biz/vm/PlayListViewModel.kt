@@ -8,6 +8,7 @@ import com.hardrubic.music.Constant
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.component.DaggerPlayListViewModelComponent
+import com.hardrubic.music.biz.helper.MusicHelper
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Music
@@ -32,8 +33,9 @@ class PlayListViewModel(application: Application) : AndroidViewModel(application
         if (TextUtils.isEmpty(ids)) {
             playListData.value = Collections.emptyList()
         } else {
-            val musics = musicRepository.queryMusic(ids!!.split(",").map { it.toLong() })
-            playListData.value = musics
+            val initialMusicIds = ids!!.split(",").map { it.toLong() }
+            val musics = musicRepository.queryMusic(initialMusicIds)
+            playListData.value = MusicHelper.sortMusicByInitialId(musics, initialMusicIds)
         }
     }
 

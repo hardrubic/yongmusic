@@ -10,6 +10,7 @@ import com.hardrubic.music.Constant.Companion.LOCAL_MUSIC_MINIMUM_SIZE
 import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.biz.command.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
+import com.hardrubic.music.biz.command.ReplaceMusicsCommand
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.component.DaggerLocalMusicViewModelComponent
 import com.hardrubic.music.biz.repository.MusicRepository
@@ -61,15 +62,22 @@ class LocalMusicViewModel(application: Application) : AndroidViewModel(applicati
         musicRepository.addMusic(musics)
     }
 
-    fun selectMusic(musicIds: List<Long>, playMusicId: Long = musicIds.first()) {
+    fun selectAllMusic(musicIds: List<Long>) {
         val musics = musicRepository.queryMusic(musicIds)
-        val playMusic = musicRepository.queryMusic(playMusicId)
+        val playMusic = musics.first()
 
         MusicServiceControl.runInMusicService(getApplication()) {
-            RemoteControl.executeCommand(AddMusicsCommand(musics, musicRepository, it))
-            if (playMusic != null) {
-                RemoteControl.executeCommand(SelectAndPlayCommand(playMusic, recentRepository, it))
-            }
+            RemoteControl.executeCommand(ReplaceMusicsCommand(musics, it))
+            RemoteControl.executeCommand(SelectAndPlayCommand(playMusic, recentRepository, it))
+        }
+    }
+
+    fun selectSingleMusic(musicId: Long) {
+        val music = musicRepository.queryMusic(musicId)!!
+
+        MusicServiceControl.runInMusicService(getApplication()) {
+            RemoteControl.executeCommand(AddMusicsCommand(listOf(music), musicRepository, it))
+            RemoteControl.executeCommand(SelectAndPlayCommand(music, recentRepository, it))
         }
     }
 

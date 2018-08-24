@@ -9,19 +9,15 @@ import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.component.DaggerSearchViewModelComponent
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
-import com.hardrubic.music.biz.resource.MusicDownload
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
-import com.hardrubic.music.entity.bo.MusicResourceBO
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.HttpService
 import com.hardrubic.music.service.MusicServiceControl
 import io.reactivex.functions.Consumer
 import java.util.*
-import java.util.concurrent.CountDownLatch
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 class SearchViewModel(application: Application) : AndroidViewModel(application) {
     @Inject
@@ -70,42 +66,15 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun selectMusic(musicId: Long, errorConsumer: Consumer<Throwable>) {
-        applyMusicDetailAndResource(listOf(musicId), musicId, errorConsumer)
-    }
-
-    private fun applyMusicDetailAndResource(musicIds: List<Long>, playMusicId: Long, errorConsumer: Consumer<Throwable>) {
-        val countDownLatch = CountDownLatch(2)
-        thread {
-            var saveMusics = listOf<Music>()
-            var musicResourceBOs = listOf<MusicResourceBO>()
-
-            HttpService.instance.applyMusicDetail(musicIds)
-                    .subscribe(Consumer {
-                        saveMusics = it
-                        countDownLatch.countDown()
-                    }, errorConsumer)
-
-            HttpService.instance.applyMusicResource(musicIds)
-                    .subscribe(Consumer {
-                        MusicDownload.downloadSync(getApplication(), it, errorConsumer)
-                        musicResourceBOs = it
-                        countDownLatch.countDown()
-                    }, errorConsumer)
-
-            countDownLatch.await()
-
-            MusicDownload.fillResource2Music(saveMusics, musicResourceBOs)
-            finishCacheMusics(saveMusics, playMusicId)
-        }
-    }
-
-    private fun finishCacheMusics(musics: List<Music>, playMusicId: Long) {
+    fun saveMusics(musics: List<Music>) {
         musicRepository.addMusic(musics)
-        val playMusic = musicRepository.queryMusic(playMusicId)
+    }
 
+    fun playMusics(musics: List<Music>, playMusicId: Long) {
         MusicServiceControl.runInMusicService(getApplication()) {
             RemoteControl.executeCommand(AddMusicsCommand(musics, musicRepository, it))
+
+            val playMusic = if (playMusicId != null) musicRepository.queryMusic(playMusicId) else null
             if (playMusic != null) {
                 RemoteControl.executeCommand(SelectAndPlayCommand(playMusic, recentRepository, it))
             }

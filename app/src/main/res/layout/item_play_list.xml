@@ -12,20 +12,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
+        android:maxLines="1"
+        android:maxEms="10"
+        android:ellipsize="end"
         android:layout_gravity="center"
         android:textColor="@color/primary_text_color"
         android:textSize="@dimen/primary_text_size"
-        tools:text="name"/>
+        tools:text="very very very long name"/>
+
     <TextView
         android:id="@+id/tv_artist"
-        tools:text="artist"
+        tools:text="very very very long artist"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:maxEms="10"
         android:layout_gravity="center"
         android:gravity="left|center_vertical"
         android:textColor="@color/second_text_color"
-        android:padding="5dp"/>
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
     <ImageView
         android:id="@+id/iv_delete"

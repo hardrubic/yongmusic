@@ -12,11 +12,11 @@
         android:id="@+id/toolbar"
         style="@style/ToolbarStyle"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_list"
+    <FrameLayout
+        android:id="@+id/fl_music_list"
         android:layout_width="match_parent"
-        android:layout_weight="1"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <FrameLayout
         android:id="@+id/fl_music_control"

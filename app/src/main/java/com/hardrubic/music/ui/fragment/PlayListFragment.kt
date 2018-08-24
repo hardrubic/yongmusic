@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.app.AppCompatDialogFragment
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -80,6 +81,7 @@ class PlayListFragment : AppCompatDialogFragment() {
         adapter.playingMusicId = CurrentPlayingHelper.getPlayingMusicId()
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
+        rv_list.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
     }
 
     private fun refreshList(list: List<Music>) {

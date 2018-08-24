@@ -18,7 +18,6 @@ import com.hardrubic.music.util.LoadImageUtil
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_album_detail.*
 import kotlinx.android.synthetic.main.layout_album_detail_cover.*
-import java.io.Serializable
 
 class AlbumDetailActivity : BaseActivity() {
 
@@ -66,15 +65,8 @@ class AlbumDetailActivity : BaseActivity() {
         tv_artist.text = FormatUtil.formatArtistNames(album.getArtistNames())
         tv_time.text = FormatUtil.formatPublishTime(album.publishTime)
 
-        val commonMusicListFragmentArg = Bundle().apply {
-            putSerializable(Constant.Param.LIST, albumDetail.getMusicVOs() as Serializable)
-        }
-        val commonMusicListFragment = CommonMusicListFragment().apply {
-            arguments = commonMusicListFragmentArg
-        }
-
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_music_list, commonMusicListFragment)
+                .replace(R.id.fl_music_list, CommonMusicListFragment.instance(albumDetail.getMusicVOs()))
                 .commit()
     }
 

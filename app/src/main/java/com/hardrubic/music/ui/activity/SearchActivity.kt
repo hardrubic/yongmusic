@@ -2,16 +2,17 @@ package com.hardrubic.music.ui.activity
 
 import android.os.Bundle
 import android.support.design.widget.TabLayout
-import android.support.v7.widget.AppCompatEditText
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.Toolbar
 import com.hardrubic.music.R
+import com.hardrubic.music.R.id.*
 import com.hardrubic.music.biz.interf.Searchable
 import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.search.SearchAlbumListFragment
 import com.hardrubic.music.ui.fragment.search.SearchArtistListFragment
 import com.hardrubic.music.ui.fragment.search.SearchMusicListFragment
+import com.hardrubic.music.ui.widget.edittext.ClearableEditText
 import com.hardrubic.music.util.LoadingDialogUtil
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,14 +31,13 @@ class SearchActivity : BaseActivity() {
     private fun initView() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        val searchView = AppCompatEditText(this).apply {
+        val searchView = ClearableEditText(this).apply {
             this.hint = getString(R.string.search)
             this.imeOptions = EditorInfo.IME_ACTION_SEARCH
             this.inputType = EditorInfo.TYPE_CLASS_TEXT;
             this.setOnEditorActionListener { textVIew, actionId, event ->
                 event != null && event.keyCode == KeyEvent.KEYCODE_ENTER
             }
-            //todo 光标颜色，清空按钮
         }
         toolbar.addView(searchView, Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT))
         toolbar.title = ""

@@ -55,9 +55,6 @@ class ArtistDetailActivity : BaseActivity() {
         collapsing_toolbar_layout.title = artist.name
         LoadImageUtil.loadFromNetwork(this, artist.picUrl, iv_cover)
 
-        val commonMusicListFragmentArg = Bundle().apply {
-            putSerializable(Constant.Param.LIST, musics as Serializable)
-        }
         val artistAlbumFragmentArg = Bundle().apply {
             putSerializable(Constant.Param.LIST, albums as Serializable)
         }
@@ -65,9 +62,6 @@ class ArtistDetailActivity : BaseActivity() {
             putString(Constant.Param.NAME, artist.briefDesc)
         }
 
-        val commonMusicListFragment = CommonMusicListFragment().apply {
-            arguments = commonMusicListFragmentArg
-        }
         val artistAlbumFragment = ArtistAlbumFragment().apply {
             arguments = artistAlbumFragmentArg
         }
@@ -76,7 +70,7 @@ class ArtistDetailActivity : BaseActivity() {
         }
 
         vp_list.adapter = MyViewPagerAdapter(supportFragmentManager).apply {
-            addFragment(commonMusicListFragment, getString(R.string.music))
+            addFragment(CommonMusicListFragment.instance(musics), getString(R.string.music))
             addFragment(artistAlbumFragment, getString(R.string.album))
             addFragment(artistDescFragment, getString(R.string.introduction))
         }

@@ -22,8 +22,7 @@ class PlayListAdapter(data: List<Music>)
             baseViewHolder.setTextColor(R.id.tv_name, ContextCompat.getColor(mContext, R.color.colorPrimary))
         }
 
-        baseViewHolder.setText(R.id.tv_artist, FormatUtil.formatArtistNames(music.artistNames))
+        baseViewHolder.setText(R.id.tv_artist, "- ${FormatUtil.formatArtistNames(music.artistNames)}")
         baseViewHolder.addOnClickListener(R.id.iv_delete)
     }
-
 }

@@ -1,7 +1,6 @@
 package com.hardrubic.music.ui.fragment
 
 import android.arch.lifecycle.ViewModelProviders
-import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -10,20 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
+import com.hardrubic.music.biz.helper.MusicHelper
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
-import com.hardrubic.music.biz.interf.DialogBtnListener
+import com.hardrubic.music.biz.interf.MusicResourceListener
+import com.hardrubic.music.biz.resource.MusicResourceDownload
 import com.hardrubic.music.biz.vm.CommonMusicListViewModel
+import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.widget.view.MusicBatchHeaderView
 import com.hardrubic.music.ui.widget.view.OnMusicBatchHeaderViewListener
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
+import java.io.Serializable
+import java.util.*
 
 class CommonMusicListFragment : BaseFragment() {
 
     private val musics: List<MusicVO>
-        get() = arguments?.getSerializable(Constant.Param.LIST) as List<MusicVO>
+        get() = arguments?.getSerializable(Constant.Param.LIST) as List<MusicVO>? ?: Collections.emptyList()
+    private val network: Boolean
+        get() = arguments?.getBoolean(Constant.Param.NETWORK) as Boolean
 
     private val viewModel: CommonMusicListViewModel by lazy {
         ViewModelProviders.of(mActivity).get(CommonMusicListViewModel::class.java)
@@ -50,9 +55,9 @@ class CommonMusicListFragment : BaseFragment() {
                     return
                 }
 
-                viewModel.selectMusic(musicIds, musicIds.first(), Consumer {
-                    showError(it)
-                })
+                applySelectMusic(musicIds) { it ->
+                    viewModel.playMusics(it)
+                }
             }
         }
 
@@ -61,26 +66,53 @@ class CommonMusicListFragment : BaseFragment() {
         adapter.setOnItemClickListener { adapter, view, position ->
             val musicVO = (adapter as ShowMusicAdapter).getItem(position)!!
 
-            viewModel.selectMusic(musicVO.musicId, Consumer {
-                showError(it)
-            })
+            applySelectMusic(listOf(musicVO.musicId)) {
+                viewModel.playMusic(musicVO.musicId)
+            }
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
         rv_list.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
     }
 
-    private fun showError(throwable: Throwable) {
-        ShowExceptionHelper.show(mActivity, throwable, object : DialogBtnListener {
-            override fun onClickOkListener(dialog: DialogInterface?) {
-                //TODO 没有确定按钮
-                dialog?.dismiss()
-            }
+    private fun applySelectMusic(initialMusicIds: List<Long>, successCallback: (musics: List<Music>) -> Unit) {
+        if (network) {
+            val progressDialogFragment = ProgressDialogFragment()
+            progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
 
-            override fun onClickCancelListener(dialog: DialogInterface?) {
-                dialog?.dismiss()
+            MusicResourceDownload.downloadMusicResource(mActivity, initialMusicIds, object : MusicResourceListener {
+                override fun onProgress(progress: Int, max: Int) {
+                    progressDialogFragment.refreshProgress(progress, max)
+                }
+
+                override fun onSuccess(musics: List<Music>) {
+                    viewModel.saveMusics(musics)
+                    successCallback.invoke(MusicHelper.sortMusicByInitialId(musics, initialMusicIds))
+                    progressDialogFragment.dismiss()
+                }
+
+                override fun onError(e: Throwable) {
+                    ShowExceptionHelper.show(mActivity, e)
+                }
+            })
+        } else {
+            val musics = viewModel.queryMusics(initialMusicIds)
+            successCallback.invoke(MusicHelper.sortMusicByInitialId(musics, initialMusicIds))
+        }
+    }
+
+    companion object {
+
+        fun instance(musicVOs: List<MusicVO>, network: Boolean = true): CommonMusicListFragment {
+            val bundle = Bundle().apply {
+                if (musicVOs.isNotEmpty()) {
+                    putSerializable(Constant.Param.LIST, musicVOs as Serializable)
+                }
+                putBoolean(Constant.Param.NETWORK, network)
             }
-        })
-        throwable.printStackTrace()
+            return CommonMusicListFragment().apply {
+                arguments = bundle
+            }
+        }
     }
 }
