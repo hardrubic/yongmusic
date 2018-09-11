@@ -19,9 +19,11 @@ import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.widget.view.MusicBatchHeaderView
 import com.hardrubic.music.ui.widget.view.OnMusicBatchHeaderViewListener
+import dagger.Lazy
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.io.Serializable
 import java.util.*
+import javax.inject.Inject
 
 class CommonMusicListFragment : BaseFragment() {
 
@@ -30,8 +32,11 @@ class CommonMusicListFragment : BaseFragment() {
     private val network: Boolean
         get() = arguments?.getBoolean(Constant.Param.NETWORK) as Boolean
 
+    @Inject
+    lateinit var musicResourceDownload: Lazy<MusicResourceDownload>
+
     private val viewModel: CommonMusicListViewModel by lazy {
-        ViewModelProviders.of(mActivity).get(CommonMusicListViewModel::class.java)
+        ViewModelProviders.of(mActivity, viewModelFactory).get(CommonMusicListViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -80,7 +85,7 @@ class CommonMusicListFragment : BaseFragment() {
             val progressDialogFragment = ProgressDialogFragment()
             progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
 
-            MusicResourceDownload.downloadMusicResource(mActivity, initialMusicIds, object : MusicResourceListener {
+            musicResourceDownload.get().downloadMusicResource(mActivity, initialMusicIds, object : MusicResourceListener {
                 override fun onProgress(progress: Int, max: Int) {
                     progressDialogFragment.refreshProgress(progress, max)
                 }
@@ -92,6 +97,7 @@ class CommonMusicListFragment : BaseFragment() {
                 }
 
                 override fun onError(e: Throwable) {
+                    progressDialogFragment.dismiss()
                     ShowExceptionHelper.show(mActivity, e)
                 }
             })

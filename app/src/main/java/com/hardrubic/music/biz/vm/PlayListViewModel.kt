@@ -1,13 +1,12 @@
 package com.hardrubic.music.biz.vm
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
 import android.text.TextUtils
 import com.hardrubic.music.Constant
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
-import com.hardrubic.music.biz.component.DaggerPlayListViewModelComponent
 import com.hardrubic.music.biz.helper.MusicHelper
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
@@ -17,16 +16,9 @@ import com.hardrubic.music.util.PreferencesUtil
 import java.util.*
 import javax.inject.Inject
 
-class PlayListViewModel(application: Application) : AndroidViewModel(application) {
-    @Inject
-    lateinit var musicRepository: MusicRepository
-    @Inject
-    lateinit var recentRepository: RecentRepository
+class PlayListViewModel @Inject constructor(val application: Application, val musicRepository: MusicRepository,
+                                            val recentRepository: RecentRepository) : ViewModel() {
     val playListData = MutableLiveData<List<Music>>()
-
-    init {
-        DaggerPlayListViewModelComponent.builder().build().inject(this)
-    }
 
     fun queryPlayList() {
         val ids = PreferencesUtil.instance.getString(Constant.SpKey.PLAY_LIST)
@@ -40,7 +32,7 @@ class PlayListViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun selectMusic(music: Music) {
-        MusicServiceControl.runInMusicService(getApplication()) {
+        MusicServiceControl.runInMusicService(application) {
             RemoteControl.executeCommand(SelectAndPlayCommand(music, recentRepository, it))
         }
     }

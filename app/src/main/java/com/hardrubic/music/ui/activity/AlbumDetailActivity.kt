@@ -1,5 +1,7 @@
 package com.hardrubic.music.ui.activity
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -9,8 +11,7 @@ import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
 import com.hardrubic.music.biz.interf.DialogBtnListener
-import com.hardrubic.music.network.HttpService
-import com.hardrubic.music.network.response.AlbumDetailResponse
+import com.hardrubic.music.biz.vm.AlbumDetailViewModel
 import com.hardrubic.music.ui.fragment.CommonMusicListFragment
 import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
 import com.hardrubic.music.util.FormatUtil
@@ -26,16 +27,45 @@ class AlbumDetailActivity : BaseActivity() {
     }
     private var albumName = ""
 
+    private val viewModel: AlbumDetailViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(AlbumDetailViewModel::class.java)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_album_detail)
 
         initData()
         initView()
-        applyQueryAlbumDetail()
+
+        viewModel.internalQueryAlbumDetail(albumId, Consumer {
+            ShowExceptionHelper.show(this, it, object : DialogBtnListener {
+                override fun onClickOkListener(dialog: DialogInterface?) {
+                    dialog?.dismiss()
+                }
+
+                override fun onClickCancelListener(dialog: DialogInterface?) {
+                    dialog?.dismiss()
+                }
+            })
+            it.printStackTrace()
+        })
     }
 
     private fun initData() {
+        viewModel.albumDetailData.observe(this, Observer {
+            this.albumName = it!!.name
+
+            LoadImageUtil.loadFromNetwork(this, it.picUrl, iv_cover)
+            tv_name.text = it.name
+            tv_artist.text = FormatUtil.formatArtistNames(it.getArtistNames())
+            tv_time.text = FormatUtil.formatPublishTime(it.publishTime)
+        })
+        viewModel.albumMusicData.observe(this, Observer {
+            supportFragmentManager.beginTransaction()
+                    .replace(R.id.fl_music_list, CommonMusicListFragment.instance(it!!))
+                    .commit()
+        })
     }
 
     private fun initView() {
@@ -54,40 +84,6 @@ class AlbumDetailActivity : BaseActivity() {
                 collapsing_toolbar_layout.title = ""
             }
         }
-    }
-
-    private fun refreshAlbumDetail(albumDetail: AlbumDetailResponse) {
-        val album = albumDetail.album!!
-        this.albumName = album.name
-
-        LoadImageUtil.loadFromNetwork(this, album.picUrl, iv_cover)
-        tv_name.text = album.name
-        tv_artist.text = FormatUtil.formatArtistNames(album.getArtistNames())
-        tv_time.text = FormatUtil.formatPublishTime(album.publishTime)
-
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_music_list, CommonMusicListFragment.instance(albumDetail.getMusicVOs()))
-                .commit()
-    }
-
-    //TODO move to viewmodel
-    private fun applyQueryAlbumDetail() {
-        HttpService.instance.applyAlbumDetail(albumId)
-                .subscribe(Consumer {
-                    refreshAlbumDetail(it)
-                }, Consumer {
-                    ShowExceptionHelper.show(this, it, object : DialogBtnListener {
-                        override fun onClickOkListener(dialog: DialogInterface?) {
-                            applyQueryAlbumDetail()
-                            dialog?.dismiss()
-                        }
-
-                        override fun onClickCancelListener(dialog: DialogInterface?) {
-                            dialog?.dismiss()
-                        }
-                    })
-                    it.printStackTrace()
-                })
     }
 
     companion object {

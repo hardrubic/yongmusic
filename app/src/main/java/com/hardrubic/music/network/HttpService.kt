@@ -13,10 +13,10 @@ import com.hardrubic.music.util.JSUtil
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlin.properties.Delegates
+import javax.inject.Inject
 
 
-class HttpService {
+class HttpService @Inject constructor(val api: HttpApi) {
 
     fun applyLogin(phone: String, password: String): Single<LoginResponse> {
         val param = hashMapOf<String, String>()
@@ -155,17 +155,6 @@ class HttpService {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode())
-    }
-
-    companion object {
-
-        private lateinit var api: HttpApi
-        var instance: HttpService by Delegates.notNull()
-
-        fun register() {
-            instance = HttpService()
-            api = HttpManager().createApi(HttpApi::class.java)
-        }
     }
 
     private class MusicDetailParamId(val id: Long)

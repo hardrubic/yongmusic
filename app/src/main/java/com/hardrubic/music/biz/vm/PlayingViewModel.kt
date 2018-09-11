@@ -1,12 +1,10 @@
 package com.hardrubic.music.biz.vm
 
-import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import android.arch.lifecycle.ViewModel
 import com.hardrubic.music.Constant
 import com.hardrubic.music.biz.command.NextCommand
 import com.hardrubic.music.biz.command.PreviousCommand
 import com.hardrubic.music.biz.command.RemoteControl
-import com.hardrubic.music.biz.component.DaggerPlayingViewModelComponent
 import com.hardrubic.music.biz.repository.CollectionRepository
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
@@ -17,19 +15,10 @@ import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.service.MusicServiceControl
 import javax.inject.Inject
 
-class PlayingViewModel(application: Application) : AndroidViewModel(application) {
-    @Inject
-    lateinit var musicRepository: MusicRepository
-    @Inject
-    lateinit var recentRepository: RecentRepository
-    @Inject
-    lateinit var collectionRepository: CollectionRepository
+class PlayingViewModel @Inject constructor(val musicRepository: MusicRepository,
+                                           val recentRepository: RecentRepository, val collectionRepository: CollectionRepository) : ViewModel() {
 
     var playingMusic: Music? = null
-
-    init {
-        DaggerPlayingViewModelComponent.builder().build().inject(this)
-    }
 
     fun existPlayingMusic(): Boolean {
         return playingMusic != null

@@ -19,7 +19,7 @@ class CollectionDetailActivity : BaseActivity() {
     }
 
     private val viewModel: CollectionDetailViewModel by lazy {
-        ViewModelProviders.of(this).get(CollectionDetailViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(CollectionDetailViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

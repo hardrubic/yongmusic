@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_local_music.*
 class LocalMusicActivity : BaseActivity() {
 
     private val viewModel: LocalMusicViewModel by lazy {
-        ViewModelProviders.of(this).get(LocalMusicViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(LocalMusicViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

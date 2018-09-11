@@ -12,11 +12,11 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
-import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.vm.MainViewModel
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.service.MusicService
 import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.DiscoverFragment
@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.content_main.*
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val viewModel by lazy {
-        ViewModelProviders.of(this).get(MainViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(MainViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

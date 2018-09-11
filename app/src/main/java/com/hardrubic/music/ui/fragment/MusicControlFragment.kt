@@ -24,7 +24,7 @@ class MusicControlFragment : BaseFragment() {
     private val musicServiceControl = MusicServiceControl()
 
     private val viewModel by lazy {
-        ViewModelProviders.of(this).get(MusicControlViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(MusicControlViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

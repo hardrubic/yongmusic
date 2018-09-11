@@ -1,7 +1,9 @@
 package com.hardrubic.music.ui.fragment
 
 import android.app.Dialog
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.os.Bundle
 import android.support.design.widget.BottomSheetDialog
 import android.support.v7.app.AppCompatDialogFragment
@@ -21,14 +23,19 @@ import com.hardrubic.music.biz.vm.PlayListViewModel
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.service.MusicServiceControl
 import com.hardrubic.music.ui.adapter.PlayListAdapter
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_play_list.*
 import java.util.*
+import javax.inject.Inject
 
 class PlayListFragment : AppCompatDialogFragment() {
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private val adapter = PlayListAdapter(Collections.emptyList())
     private val viewModel by lazy {
-        ViewModelProviders.of(this).get(PlayListViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(PlayListViewModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -44,6 +51,11 @@ class PlayListFragment : AppCompatDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetDialog(this.context!!, this.theme)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        AndroidSupportInjection.inject(this)
     }
 
     private fun initData() {

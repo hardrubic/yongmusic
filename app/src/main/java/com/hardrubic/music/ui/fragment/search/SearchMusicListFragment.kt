@@ -21,13 +21,19 @@ import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
 import com.hardrubic.music.ui.fragment.ProgressDialogFragment
 import com.hardrubic.music.util.LoadingDialogUtil
+import dagger.Lazy
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
+import javax.inject.Inject
 
 class SearchMusicListFragment : BaseFragment(), Searchable {
+
+    @Inject
+    lateinit var musicResourceDownload: Lazy<MusicResourceDownload>
+
     private val viewModel: SearchViewModel by lazy {
-        ViewModelProviders.of(mActivity).get(SearchViewModel::class.java)
+        ViewModelProviders.of(mActivity, viewModelFactory).get(SearchViewModel::class.java)
     }
 
     private lateinit var adapter: ShowMusicAdapter
@@ -65,7 +71,7 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
         val progressDialogFragment = ProgressDialogFragment()
         progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
 
-        MusicResourceDownload.downloadMusicResource(mActivity, listOf(musicVO.musicId), object : MusicResourceListener {
+        musicResourceDownload.get().downloadMusicResource(mActivity, listOf(musicVO.musicId), object : MusicResourceListener {
             override fun onProgress(progress: Int, max: Int) {
                 progressDialogFragment.refreshProgress(progress, max)
             }
@@ -77,6 +83,7 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
             }
 
             override fun onError(e: Throwable) {
+                progressDialogFragment.dismiss()
                 ShowExceptionHelper.show(mActivity, e)
             }
         })

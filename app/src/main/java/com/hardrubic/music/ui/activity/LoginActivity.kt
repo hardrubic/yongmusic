@@ -2,7 +2,6 @@ package com.hardrubic.music.ui.activity
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -14,8 +13,12 @@ import com.hardrubic.music.network.response.LoginResponse
 import com.hardrubic.music.util.MD5Util
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_login.*
+import javax.inject.Inject
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
+
+    @Inject
+    lateinit var httpService: HttpService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +34,6 @@ class LoginActivity : AppCompatActivity() {
 
         btn_login_in.setOnClickListener { attemptLogin() }
     }
-
 
     private fun attemptLogin() {
         tv_phone.error = null
@@ -65,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         val passwordMd5 = MD5Util.getDigest(password)
-        HttpService.instance.applyLogin(account, passwordMd5)
+        httpService.applyLogin(account, passwordMd5)
                 .subscribe(Consumer<LoginResponse> {
                     val loginId = it.account!!.id
                     val loginName = it.profile!!.nickname

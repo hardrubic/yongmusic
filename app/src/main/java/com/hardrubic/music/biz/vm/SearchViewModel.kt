@@ -6,7 +6,6 @@ import android.arch.lifecycle.MutableLiveData
 import com.hardrubic.music.biz.command.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
-import com.hardrubic.music.biz.component.DaggerSearchViewModelComponent
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Album
@@ -19,25 +18,17 @@ import io.reactivex.functions.Consumer
 import java.util.*
 import javax.inject.Inject
 
-class SearchViewModel(application: Application) : AndroidViewModel(application) {
-    @Inject
-    lateinit var musicRepository: MusicRepository
-    @Inject
-    lateinit var recentRepository: RecentRepository
-
+class SearchViewModel @Inject constructor(application: Application, val musicRepository: MusicRepository,
+                                          val recentRepository: RecentRepository, val httpService: HttpService) : AndroidViewModel(application) {
     val musicData = MutableLiveData<List<MusicVO>>()
     val artistData = MutableLiveData<List<Artist>>()
     val albumData = MutableLiveData<List<Album>>()
-
-    init {
-        DaggerSearchViewModelComponent.builder().build().inject(this)
-    }
 
     fun searchMusic(searchText: String, errorConsumer: Consumer<Throwable>) {
         if (searchText.isEmpty()) {
             musicData.value = Collections.emptyList()
         } else {
-            HttpService.instance.applySearchMusic(searchText)
+            httpService.applySearchMusic(searchText)
                     .subscribe(Consumer<List<MusicVO>> {
                         musicData.value = it
                     }, errorConsumer)
@@ -48,18 +39,19 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         if (searchText.isEmpty()) {
             artistData.value = Collections.emptyList()
         } else {
-            HttpService.instance.applySearchArtist(searchText)
+            httpService.applySearchArtist(searchText)
                     .subscribe(Consumer<List<Artist>> {
                         artistData.value = it
                     }, errorConsumer)
         }
     }
 
+
     fun searchAlbum(searchText: String, errorConsumer: Consumer<Throwable>) {
         if (searchText.isEmpty()) {
             albumData.value = Collections.emptyList()
         } else {
-            HttpService.instance.applySearchAlbum(searchText)
+            httpService.applySearchAlbum(searchText)
                     .subscribe(Consumer<List<Album>> {
                         albumData.value = it
                     }, errorConsumer)

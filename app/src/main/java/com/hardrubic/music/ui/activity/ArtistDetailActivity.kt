@@ -31,7 +31,7 @@ class ArtistDetailActivity : BaseActivity() {
     }
 
     private val viewModel: ArtistDetailViewModel by lazy {
-        ViewModelProviders.of(this).get(ArtistDetailViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(ArtistDetailViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,10 +1,12 @@
 package com.hardrubic.music.ui.activity
 
 import android.app.Activity
+import android.arch.lifecycle.ViewModelProvider
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
@@ -23,22 +25,36 @@ import com.hardrubic.music.ui.widget.statusbar.StatusBarColor
 import com.hardrubic.music.util.DrawableUtil
 import com.hardrubic.music.util.FormatUtil
 import com.hardrubic.music.util.LoadImageUtil
+import dagger.android.AndroidInjection
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_playing.*
+import javax.inject.Inject
 
-class PlayingActivity : AppCompatActivity() {
+class PlayingActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     private val musicServiceControl = MusicServiceControl()
     private var movingProgress = false
     private var love: Boolean? = null
 
+    @Inject
+    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
+
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> = fragmentInjector
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private val viewModel: PlayingViewModel by lazy {
-        ViewModelProviders.of(this).get(PlayingViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(PlayingViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
 
+        AndroidInjection.inject(this)
         initView()
     }
 

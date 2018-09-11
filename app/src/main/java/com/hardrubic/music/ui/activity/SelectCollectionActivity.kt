@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.activity_select_collection.*
 class SelectCollectionActivity : BaseActivity() {
 
     private val viewModel by lazy {
-        ViewModelProviders.of(this).get(SelectCollectionViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(SelectCollectionViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +45,8 @@ class SelectCollectionActivity : BaseActivity() {
         }
         rv_list.layoutManager = LinearLayoutManager(this)
         rv_list.adapter = collectionAdapter
+
+        showMusicControl()
     }
 
     private fun addCollection() {

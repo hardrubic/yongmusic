@@ -24,7 +24,7 @@ import java.util.*
 class SearchAlbumListFragment : BaseFragment(), Searchable {
 
     private val viewModel: SearchViewModel by lazy {
-        ViewModelProviders.of(mActivity).get(SearchViewModel::class.java)
+        ViewModelProviders.of(mActivity, viewModelFactory).get(SearchViewModel::class.java)
     }
 
     private lateinit var adapter: AlbumListAdapter

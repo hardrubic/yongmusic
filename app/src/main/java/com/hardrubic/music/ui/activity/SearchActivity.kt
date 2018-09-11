@@ -6,7 +6,6 @@ import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.Toolbar
 import com.hardrubic.music.R
-import com.hardrubic.music.R.id.*
 import com.hardrubic.music.biz.interf.Searchable
 import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.search.SearchAlbumListFragment

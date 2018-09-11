@@ -3,7 +3,6 @@ package com.hardrubic.music.ui.fragment
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -21,10 +20,10 @@ import com.hardrubic.music.util.DrawableUtil
 import kotlinx.android.synthetic.main.fragment_main_list.*
 import java.util.*
 
-class MainListFragment : Fragment() {
+class MainListFragment : BaseFragment() {
 
     private val viewModel by lazy {
-        ViewModelProviders.of(activity!!).get(MainViewModel::class.java)
+        ViewModelProviders.of(mActivity, viewModelFactory).get(MainViewModel::class.java)
     }
 
     private lateinit var collectionAdapter: CollectionAdapter

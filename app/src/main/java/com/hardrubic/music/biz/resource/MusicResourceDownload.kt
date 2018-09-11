@@ -11,10 +11,11 @@ import zlc.season.rxdownload3.RxDownload
 import zlc.season.rxdownload3.core.Mission
 import zlc.season.rxdownload3.core.Status
 import zlc.season.rxdownload3.core.Succeed
+import java.lang.Exception
 import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 
-object MusicResourceDownload {
+class MusicResourceDownload(val httpService: HttpService) {
 
     private object ProgressWeight {
         const val MUSIC_DETAIL = 1
@@ -55,7 +56,7 @@ object MusicResourceDownload {
             var saveMusics = listOf<Music>()
             var musicResourceBOs = listOf<MusicResourceBO>()
 
-            HttpService.instance.applyMusicDetail(musicIds)
+            httpService.applyMusicDetail(musicIds)
                     .subscribe(Consumer {
                         saveMusics = it
                         refreshProgress(ProgressWeight.MUSIC_DETAIL.toFloat())
@@ -64,9 +65,9 @@ object MusicResourceDownload {
                         musicResourceListener?.onError(it)
                     })
 
-            HttpService.instance.applyMusicResource(musicIds)
+            httpService.applyMusicResource(musicIds)
                     .subscribe(Consumer {
-                        MusicResourceDownload.downloadFileSync(context, it, musicFileDownloadListener)
+                        downloadFileSync(context, it, musicFileDownloadListener)
                         musicResourceBOs = it
                         refreshProgress(ProgressWeight.MUSIC_RESOURCE.toFloat())
                         countDownLatch.countDown()
@@ -76,7 +77,7 @@ object MusicResourceDownload {
 
             countDownLatch.await()
 
-            MusicResourceDownload.fillResource2Music(saveMusics, musicResourceBOs)
+            fillResource2Music(saveMusics, musicResourceBOs)
             musicResourceListener?.onSuccess(saveMusics)
         }
     }
@@ -88,9 +89,20 @@ object MusicResourceDownload {
         val countDownLatch = CountDownLatch(total)
         //LogUtil.d("begin download music,size ${bos.size}")
         for (bo in bos) {
+            val url = bo.url
+            if (url == null || url.isEmpty()) {
+                musicFileDownloadListener.onError(Exception("url null"))
+                return
+            }
+
             val saveName = bo.md5
+            if (saveName == null || saveName.isEmpty()) {
+                musicFileDownloadListener.onError(Exception("md5 null"))
+                return
+            }
+
             bo.path = saveDir + saveName
-            val mission = Mission(bo.url, saveName, saveDir)
+            val mission = Mission(url, saveName, saveDir)
             RxDownload.create(mission, true)
                     .subscribe(Consumer<Status> { status ->
                         when (status) {

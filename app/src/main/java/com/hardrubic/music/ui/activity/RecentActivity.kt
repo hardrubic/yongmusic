@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.activity_recent.*
 class RecentActivity : BaseActivity() {
 
     private val viewModel: RecentViewModel by lazy {
-        ViewModelProviders.of(this).get(RecentViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(RecentViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

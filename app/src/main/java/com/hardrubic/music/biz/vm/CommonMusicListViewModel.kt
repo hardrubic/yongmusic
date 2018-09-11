@@ -1,28 +1,19 @@
 package com.hardrubic.music.biz.vm
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
+import android.arch.lifecycle.ViewModel
 import com.hardrubic.music.biz.command.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.ReplaceMusicsCommand
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
-import com.hardrubic.music.biz.component.DaggerCommonMusicListViewModelComponent
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Music
 import com.hardrubic.music.service.MusicServiceControl
 import javax.inject.Inject
 
-class CommonMusicListViewModel(application: Application) : AndroidViewModel(application) {
-    @Inject
-    lateinit var musicRepository: MusicRepository
-    @Inject
-    lateinit var recentRepository: RecentRepository
-
-    init {
-        DaggerCommonMusicListViewModelComponent.builder().build().inject(this)
-    }
-
+class CommonMusicListViewModel @Inject constructor(val application: Application,
+                                                   val musicRepository: MusicRepository, val recentRepository: RecentRepository) : ViewModel() {
     fun queryMusics(musicIds: List<Long>): List<Music> {
         return musicRepository.queryMusic(musicIds)
     }
@@ -34,14 +25,14 @@ class CommonMusicListViewModel(application: Application) : AndroidViewModel(appl
     fun playMusic(musicId: Long) {
         val music = musicRepository.queryMusic(musicId)!!
 
-        MusicServiceControl.runInMusicService(getApplication()) {
+        MusicServiceControl.runInMusicService(application) {
             RemoteControl.executeCommand(AddMusicsCommand(listOf(music), musicRepository, it))
             RemoteControl.executeCommand(SelectAndPlayCommand(music, recentRepository, it))
         }
     }
 
     fun playMusics(musics: List<Music>) {
-        MusicServiceControl.runInMusicService(getApplication()) {
+        MusicServiceControl.runInMusicService(application) {
             RemoteControl.executeCommand(ReplaceMusicsCommand(musics, it))
             RemoteControl.executeCommand(SelectAndPlayCommand(musics.first(), recentRepository, it))
         }
