@@ -18,6 +18,13 @@ android {
         versionCode 2
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        externalNativeBuild {
+            cmake {
+                abiFilters 'armeabi-v7a'
+                cppFlags "-std=c++11"
+            }
+        }
     }
     buildTypes {
         release {
@@ -35,6 +42,11 @@ android {
             aidl.srcDirs = ['src/main/aidl']
             res.srcDirs = ['src/main/res']
             assets.srcDirs = ['src/main/assets']
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
         }
     }
 }

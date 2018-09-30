@@ -1,7 +1,7 @@
 package com.hardrubic.music.network
 
 import com.google.gson.Gson
-import com.hardrubic.music.application.AppApplication
+import com.hardrubic.music.biz.encrypt.EncryptParamBuilder
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
@@ -9,7 +9,6 @@ import com.hardrubic.music.entity.bo.MusicResourceBO
 import com.hardrubic.music.entity.vo.AlbumVO
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.response.*
-import com.hardrubic.music.util.JSUtil
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -24,7 +23,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
         param["password"] = password
         param["rememberLogin"] = "true"
 
-        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
 
         return api.login(encryptParam)
                 .subscribeOn(Schedulers.io())
@@ -98,7 +97,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
         val param = hashMapOf<String, String>()
         param["csrf_token"] = ""
 
-        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
 
         return api.artistHotMusic(artistId, encryptParam)
                 .subscribeOn(Schedulers.io())
@@ -114,7 +113,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
         param["total"] = "true"
         //param["csrf_token"] = ""
 
-        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
 
         return api.artistHotAlbum(artistId, encryptParam)
                 .subscribeOn(Schedulers.io())
@@ -135,7 +134,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
         val param = hashMapOf<String, String>()
         param["c"] = Gson().toJson(ids)
 
-        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
 
         return api.musicDetail(encryptParam)
                 .subscribeOn(Schedulers.io())
@@ -149,7 +148,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
         val param = hashMapOf<String, String>()
         param["csrf_token"] = ""
 
-        val encryptParam = JSUtil.buildEncryptParamMap(AppApplication.instance(), param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
 
         return api.albumDetail(albumId, encryptParam)
                 .subscribeOn(Schedulers.io())
