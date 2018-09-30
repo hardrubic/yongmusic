@@ -25,7 +25,7 @@ class PlayListViewModel @Inject constructor(val application: Application, val mu
         if (TextUtils.isEmpty(ids)) {
             playListData.value = Collections.emptyList()
         } else {
-            val initialMusicIds = ids!!.split(",").map { it.toLong() }
+            val initialMusicIds = ids.split(",").map { it.toLong() }
             val musics = musicRepository.queryMusic(initialMusicIds)
             playListData.value = MusicHelper.sortMusicByInitialId(musics, initialMusicIds)
         }

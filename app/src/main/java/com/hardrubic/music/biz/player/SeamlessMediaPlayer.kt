@@ -3,21 +3,21 @@ package com.hardrubic.music.biz.player
 import android.arch.lifecycle.MutableLiveData
 import android.media.MediaPlayer
 import com.hardrubic.music.Constant
+import com.hardrubic.music.biz.helper.PlayModelHelper
 import com.hardrubic.music.entity.aidl.MusicAidl
-import com.hardrubic.music.util.LogUtil
+import com.hardrubic.music.service.MusicService
+import java.io.File
 
 /**
  * 无缝播放
  */
 class SeamlessMediaPlayer {
     private lateinit var currentMediaPlayer: MediaPlayer
-    private var nextMediaPlayer: MediaPlayer? = null
+    private lateinit var nextMediaPlayer: MediaPlayer
+    private var nextMediaPlayerPrePrepared = false
     private val musicDispatch = MusicDispatch()
 
-    val playStateData = MutableLiveData<Boolean>()
     val currentMusicData = MutableLiveData<MusicAidl>()
-
-    private var currentMediaPlayerPrepare = false
 
     init {
         initMediaPlayer()
@@ -26,47 +26,83 @@ class SeamlessMediaPlayer {
     private fun initMediaPlayer() {
         currentMediaPlayer = MediaPlayer()
         currentMediaPlayer.setOnCompletionListener {
-            LogUtil.d("MusicService:current music completed")
-            this.currentMediaPlayer.release()
-
-            consumeNextPlayMediaPlayer()
+            completeMusic()
         }
-    }
+        currentMediaPlayer.setOnErrorListener { mp, what, extra ->
+            MusicService.debugInner("currentMediaPlayer error")
+            true
+        }
 
-    private fun setCurrentMediaPlayer(music: MusicAidl) {
-        this.currentMediaPlayer.reset()
-        this.currentMediaPlayer.isLooping = musicDispatch.singlePlaying()
-        this.currentMediaPlayer.setDataSource(music.path)
-        this.currentMediaPlayer.prepare()
-        this.currentMediaPlayerPrepare = true
-        this.currentMediaPlayer.setOnErrorListener { mp, what, extra ->
-            LogUtil.d("MusicService:setCurrentMediaPlayer error")
+        nextMediaPlayer = MediaPlayer()
+        nextMediaPlayer.setOnCompletionListener {
+            completeMusic()
+        }
+        nextMediaPlayer.setOnErrorListener { mp, what, extra ->
+            MusicService.debugInner("setNextMediaPlayer error")
             true
         }
     }
 
-    private fun setNextMediaPlayer() {
-        val nextMusic = musicDispatch.next() ?: return
-        this.nextMediaPlayer = MediaPlayer().apply {
-            isLooping = musicDispatch.singlePlaying()
-            setDataSource(nextMusic.path)
-            prepare()
-            setOnErrorListener { mp, what, extra ->
-                LogUtil.d("MusicService:setNextMediaPlayer error")
-                true
-            }
-        }
-        this.currentMediaPlayer.setNextMediaPlayer(this.nextMediaPlayer)
+    private fun setCurrentMediaPlayer(music: MusicAidl) {
+        currentMediaPlayer.reset()
+        currentMediaPlayer.isLooping = musicDispatch.singlePlaying()
+        currentMediaPlayer.setDataSource(music.path)
+        currentMediaPlayer.prepare()
+        MusicService.debugMusic("触发播放歌曲[${music.name}]")
     }
 
-    private fun consumeNextPlayMediaPlayer() {
-        if (nextMediaPlayer != null) {
-            this.currentMediaPlayer = nextMediaPlayer!!
-            this.currentMediaPlayerPrepare = true
-            val nextMusic = this.musicDispatch.playNext()
-            this.currentMusicData.postValue(nextMusic)
-            play()
+    private fun setNextMediaPlayer() {
+        val nextMusic = musicDispatch.next()
+        if (nextMusic == null) {
+            nextMediaPlayerPrePrepared = false
+            return
         }
+
+        if (!varifyMusic(nextMusic)) {
+            nextMediaPlayerPrePrepared = false
+            return
+        }
+        nextMediaPlayerPrePrepared = true
+
+        nextMediaPlayer.reset()
+        nextMediaPlayer.isLooping = musicDispatch.singlePlaying()
+        nextMediaPlayer.setDataSource(nextMusic.path)
+        nextMediaPlayer.prepare()
+
+        currentMediaPlayer.setNextMediaPlayer(nextMediaPlayer)
+        MusicService.debugMusic("设置下一首歌曲[${nextMusic.name}]")
+    }
+
+    private fun varifyMusic(music: MusicAidl): Boolean {
+        val file = File(music.path)
+        if (!file.exists() || !file.isFile) {
+            MusicService.debugMusic("[${music.name}-${music.path}]校验不通过")
+            return false
+        }
+        return true
+    }
+
+    private fun completeMusic() {
+        MusicService.debugMusic("[${musicDispatch.playingMusic!!.name}]播放完毕")
+        consumeNextMusic()
+    }
+
+    private fun consumeNextMusic() {
+        if (!nextMediaPlayerPrePrepared) {
+            MusicService.debugMusic("没有下一首歌")
+            return
+        }
+
+        //swap
+        val tmp = nextMediaPlayer
+        nextMediaPlayer = currentMediaPlayer
+        currentMediaPlayer = tmp
+
+        val music = this.musicDispatch.playNext()!!
+        this.currentMusicData.postValue(music)
+        play()
+        MusicService.debugMusic("播放下一首歌曲[${music.name}]")
+
         setNextMediaPlayer()
     }
 
@@ -75,7 +111,7 @@ class SeamlessMediaPlayer {
             seekTo(0)
         } else {
             stop()
-            consumeNextPlayMediaPlayer()
+            consumeNextMusic()
         }
     }
 
@@ -98,18 +134,26 @@ class SeamlessMediaPlayer {
         play()
     }
 
-    fun play() {
-        if (currentMediaPlayerPrepare) {
-            this.currentMediaPlayer.start()
-            this.playStateData.postValue(true)
+    /**
+     * @return whether to change the state
+     */
+    fun play(): Boolean {
+        if (!isPlaying()) {
+            currentMediaPlayer.start()
+            return true
         }
+        return false
     }
 
-    fun pause() {
+    /**
+     * @return whether to change the state
+     */
+    fun pause(): Boolean {
         if (isPlaying()) {
             currentMediaPlayer.pause()
-            this.playStateData.postValue(false)
+            return true
         }
+        return false
     }
 
     fun stop() {
@@ -135,30 +179,29 @@ class SeamlessMediaPlayer {
     }
 
     fun destroy() {
-        this.currentMediaPlayer.release()
-        this.nextMediaPlayer?.release()
+        currentMediaPlayer.release()
+        nextMediaPlayer.release()
     }
 
     fun updatePlayModel(playModel: Int) {
-        LogUtil.d("MusicService:playModel[$playModel]")
+        MusicService.debugMusic("更新循环模式[${PlayModelHelper.debugPlayModelName(playModel)}]")
 
         val isSingle = playModel == Constant.PlayModel.SINGLE
-        this.currentMediaPlayer.isLooping = isSingle
-        this.musicDispatch.playModel = playModel
+        currentMediaPlayer.isLooping = isSingle
+        nextMediaPlayer.isLooping = isSingle
+        musicDispatch.playModel = playModel
 
         //change next music
-        if (currentMediaPlayerPrepare) {
-            if (musicDispatch.singlePlaying()) {
-                this.currentMediaPlayer.setNextMediaPlayer(null)
-                this.nextMediaPlayer?.reset()
-            } else {
-                setNextMediaPlayer()
-            }
+        if (isSingle) {
+            currentMediaPlayer.setNextMediaPlayer(null)
+            nextMediaPlayer.reset()
+        } else {
+            setNextMediaPlayer()
         }
     }
 
     fun updateMusics(musics: List<MusicAidl>) {
-        LogUtil.d("MusicService:updateMusics[${musics.size}]")
-        this.musicDispatch.musics = musics
+        MusicService.debugMusic("更新播放列表[${musics.joinToString(separator = ",") { it.name }}]")
+        musicDispatch.musics = musics
     }
 }

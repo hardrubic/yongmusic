@@ -27,7 +27,6 @@
         android:layout_marginStart="8dp"/>
 
     <TextView
-        android:text="artist"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingTop="5dp"

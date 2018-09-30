@@ -40,4 +40,13 @@ object PlayModelHelper {
             else -> R.mipmap.ic_model_by_list
         }
     }
+
+    fun debugPlayModelName(model: Int): String {
+        return when (model) {
+            Constant.PlayModel.LIST -> "列表循环"
+            Constant.PlayModel.RANDOM -> "随机播放"
+            Constant.PlayModel.SINGLE -> "单曲循环"
+            else -> ""
+        }
+    }
 }

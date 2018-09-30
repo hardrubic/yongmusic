@@ -47,7 +47,6 @@
     <string name="save_to_collection">收藏到歌单</string>
     <string name="select_collection">选择歌单</string>
     <string name="edit_collection">编辑歌单</string>
-    <string name="change_cover">更换封面</string>
     <string name="downloading">下载中</string>
 
     <string name="hint_add_music_to_collection_success">成功添加音乐到:%1$s</string>

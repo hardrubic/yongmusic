@@ -204,6 +204,7 @@ class PlayingActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
             iv_cover.resetRotate()
             updateCover(music)
+            iv_cover.startRotate()
         }
 
         override fun onPlayState(flag: Boolean) {

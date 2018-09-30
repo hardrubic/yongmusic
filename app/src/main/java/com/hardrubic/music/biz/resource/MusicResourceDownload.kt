@@ -107,7 +107,7 @@ class MusicResourceDownload(val httpService: HttpService) {
                     .subscribe(Consumer<Status> { status ->
                         when (status) {
                             is Succeed -> {
-                                musicFileDownloadListener?.onFinishOne(total)
+                                musicFileDownloadListener.onFinishOne(total)
                                 countDownLatch.countDown()
                             }
                         }
@@ -117,7 +117,7 @@ class MusicResourceDownload(val httpService: HttpService) {
         }
 
         countDownLatch.await()
-        musicFileDownloadListener?.onSuccess()
+        musicFileDownloadListener.onSuccess()
 
         //LogUtil.d("finish download music")
     }

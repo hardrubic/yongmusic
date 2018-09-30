@@ -1,5 +1,6 @@
 package com.hardrubic.music.ui.activity
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,6 +14,7 @@ import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import javax.inject.Inject
 
+@SuppressLint("Registered")
 open class BaseActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject

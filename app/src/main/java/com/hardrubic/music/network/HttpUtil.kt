@@ -15,7 +15,7 @@ object HttpUtil {
         val requestBody = request.body()
         if (request.method().toUpperCase() == "POST") {
             if (requestBody is FormBody) {
-                val formBody = requestBody as FormBody
+                val formBody = requestBody
                 for (i in 0 until formBody.size()) {
                     results.add("${formBody.name(i)}=${formBody.value(i)}")
                 }

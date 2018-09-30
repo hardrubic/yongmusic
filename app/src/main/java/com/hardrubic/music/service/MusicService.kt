@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.IBinder
 import com.hardrubic.music.Constant
 import com.hardrubic.music.MusicManager
-import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.biz.player.SeamlessMediaPlayer
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.util.LogUtil
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -23,13 +23,26 @@ import java.util.concurrent.TimeUnit
  */
 class MusicService : Service() {
 
+    companion object {
+        val TAG_INNER_STATE = "debug_inner"
+        val TAG_DEBUG_MUSIC = "debug_music"
+
+        fun debugInner(text: String) {
+            LogUtil.d("$TAG_INNER_STATE-$text")
+        }
+
+        fun debugMusic(text: String) {
+            LogUtil.d("$TAG_DEBUG_MUSIC-$text")
+        }
+    }
+
     private lateinit var mediaPlayer: SeamlessMediaPlayer
     private val musicManager = MusicManagerImpl()
     private val scheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
     override fun onCreate() {
         super.onCreate()
-        LogUtil.d("MusicService:create")
+        debugInner("service onCreate")
 
         initMediaPlayer()
         initProgressSchedule()
@@ -42,9 +55,6 @@ class MusicService : Service() {
                 sendCurrentMusic(it)
             }
         }
-        mediaPlayer.playStateData.observeForever { flag ->
-            sendPlayState(flag ?: false)
-        }
     }
 
     private fun initProgressSchedule() {
@@ -56,10 +66,13 @@ class MusicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        LogUtil.d("MusicService:onStartCommand")
+        debugInner("service onStartCommand")
 
         //初始化默认参数
         intent?.let {
+            val playModel = it.getIntExtra(Constant.Param.PLAY_MODEL, Constant.PlayModel.LIST)
+            internalUpdatePlayModel(playModel)
+
             val musics: List<MusicAidl>? = it.getParcelableArrayListExtra(Constant.Param.LIST)
             if (musics != null && musics.isNotEmpty()) {
                 mediaPlayer.updateMusics(musics)
@@ -72,26 +85,23 @@ class MusicService : Service() {
                 //sendCurrentMusic(playingMusic)
                 //sendPlayState(false)
             }
-
-            val playModel = it.getIntExtra(Constant.Param.PLAY_MODEL, Constant.PlayModel.LIST)
-            internalUpdatePlayModel(playModel)
         }
 
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        LogUtil.d("MusicService:onBind")
+        debugInner("service onBind")
         return musicManager
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        LogUtil.d("MusicService:onUnbind")
+        debugInner("service onUnbind")
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
-        LogUtil.d("MusicService:onDestroy")
+        debugInner("service onDestroy")
         scheduledExecutorService.shutdownNow()
         mediaPlayer.destroy()
         super.onDestroy()
@@ -129,7 +139,7 @@ class MusicService : Service() {
         }
 
         override fun applyPlayState() {
-            sendPlayState(mediaPlayer.playStateData.value ?: false)
+            sendPlayState(mediaPlayer.isPlaying())
         }
 
         override fun applyCurrentMusic() {
@@ -164,11 +174,17 @@ class MusicService : Service() {
         }
 
         override fun play() {
-            mediaPlayer.play()
+            val flag = mediaPlayer.play()
+            if (flag) {
+                sendPlayState(true)
+            }
         }
 
         override fun pause() {
-            mediaPlayer.pause()
+            val flag = mediaPlayer.pause()
+            if (flag) {
+                sendPlayState(false)
+            }
         }
     }
 

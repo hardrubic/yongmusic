@@ -44,6 +44,7 @@ class CDView : ImageView {
     }
 
     override fun onDraw(canvas: Canvas) {
+        //TODO 避免在onDraw做创建操作
         val bitmap = (drawable as BitmapDrawable).bitmap
         val bitmapShader = BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
         val circlePaint = Paint().apply {
