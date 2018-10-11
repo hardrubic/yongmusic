@@ -1,57 +1,34 @@
 package com.hardrubic.music.network
 
-import android.text.TextUtils
-import android.util.Log
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.google.gson.Gson
-import okhttp3.*
+import com.hardrubic.music.BuildConfig
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class HttpManager {
 
-    /**
-     * 拦截的HTTP的日志信息
-     */
-    class LoggingInterceptor : Interceptor {
-        @Throws(IOException::class)
-        override fun intercept(chain: Interceptor.Chain): Response {
-            val request = chain.request()
-
-            val t1 = System.currentTimeMillis()
-            Log.v(TAG, "http request -> ${request.url()} ${request.method()}")
-
-            val response = chain.proceed(request)
-
-            val t2 = System.currentTimeMillis()
-            val time = (t2 - t1) / 1000f
-            val msg = "http response -> ${response.request().url()} ${response.request().method()}, ${time}s"
-            if (time > 1000) {
-                Log.w(TAG, msg)
-            } else {
-                Log.d(TAG, msg)
-            }
-            val postParam = HttpUtil.buildHttpPostParam(request)
-            if (!TextUtils.isEmpty(postParam)) {
-                Log.d(TAG, "post param: -> $postParam")
-            }
-
-            return response
-        }
-    }
-
     companion object {
-        private val TAG = "http"
-
         fun buildOkHttpClient(cookieManager: CookieJar): OkHttpClient {
+            val httpLoggingInterceptor = HttpLoggingInterceptor()
+            if (BuildConfig.DEBUG) {
+                httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BASIC
+            } else {
+                httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.NONE
+            }
+
             return OkHttpClient.Builder()
                     .followRedirects(true)
                     .followSslRedirects(true)
-                    .addInterceptor(HttpManager.LoggingInterceptor())
+                    .addInterceptor(httpLoggingInterceptor)
                     .addNetworkInterceptor(StethoInterceptor())
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -70,7 +47,7 @@ class HttpManager {
             return retrofit.create(HttpApi::class.java)
         }
 
-        fun buildCookieManager():CookieJar{
+        fun buildCookieManager(): CookieJar {
             return object : CookieJar {
                 //TODO 持久化
                 private val cookiesMap = hashMapOf<String, List<Cookie>>()
