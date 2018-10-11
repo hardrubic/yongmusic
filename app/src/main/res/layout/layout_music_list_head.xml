@@ -14,7 +14,7 @@
         android:id="@+id/tv_head_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableLeft="@android:drawable/ic_media_play"
+        android:drawableLeft="@mipmap/ic_play_black"
         android:gravity="center"
         android:text="@string/play_all"
         android:textSize="@dimen/primary_text_size"/>

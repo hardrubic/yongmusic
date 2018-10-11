@@ -11,7 +11,6 @@ import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.vm.MainViewModel
-import com.hardrubic.music.ui.activity.AlbumDetailActivity
 import com.hardrubic.music.ui.activity.CollectionDetailActivity
 import com.hardrubic.music.ui.activity.LocalMusicActivity
 import com.hardrubic.music.ui.activity.RecentActivity
@@ -50,15 +49,7 @@ class MainListFragment : BaseFragment() {
             startCollectionDetail(Constant.LOVE_COLLECTION_ID)
         }
         ll_store.setOnClickListener {
-            //just for test
-            startActivity(Intent(activity, AlbumDetailActivity::class.java).apply {
-                putExtra(Constant.Param.ALBUM_ID, 29597L)
-            })
-            /*
-            startActivity(Intent(activity, ArtistDetailActivity::class.java).apply {
-                putExtra(Constant.Param.ARTIST_ID, 6452)
-            })
-            */
+            //TODO
         }
 
         iv_add_collection.setOnClickListener {

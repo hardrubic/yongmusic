@@ -15,7 +15,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:padding="5dp"
-        android:textColor="@color/black"
+        android:textColor="@color/primary_text_color"
         android:textSize="@dimen/primary_text_size"
         app:layout_constraintBottom_toTopOf="@+id/tv_info"
         app:layout_constraintEnd_toStartOf="@+id/tv_duration"

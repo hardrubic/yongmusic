@@ -2,9 +2,8 @@ package com.hardrubic.music.network
 
 import com.google.gson.Gson
 import com.hardrubic.music.biz.encrypt.EncryptParamBuilder
-import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
-import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.entity.bo.MusicResourceBO
 import com.hardrubic.music.entity.vo.AlbumVO
 import com.hardrubic.music.entity.vo.MusicVO
@@ -31,15 +30,16 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 .compose(CheckResponseCode())
     }
 
-    //todo 分页
-    fun applySearchMusic(searchText: String): Single<List<MusicVO>> {
+    fun applySearchMusic(searchText: String, limit: Int, offset: Int): Single<List<MusicVO>> {
         val param = hashMapOf<String, String>()
         param["s"] = searchText
         param["type"] = 1.toString()
-        param["limit"] = 10.toString()
-        param["offset"] = 0.toString()
+        param["limit"] = "$limit"
+        param["offset"] = "$offset"
 
-        return api.searchMusic(param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
+
+        return api.searchMusic(encryptParam)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode<SearchMusicResponse>())
@@ -48,14 +48,16 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 }
     }
 
-    fun applySearchArtist(searchText: String): Single<List<Artist>> {
+    fun applySearchArtist(searchText: String, limit: Int, offset: Int): Single<List<Artist>> {
         val param = hashMapOf<String, String>()
         param["s"] = searchText
         param["type"] = 100.toString()
-        param["limit"] = 10.toString()
-        param["offset"] = 0.toString()
+        param["limit"] = "$limit"
+        param["offset"] = "$offset"
 
-        return api.searchArtist(param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
+
+        return api.searchArtist(encryptParam)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode<SearchArtistResponse>())
@@ -64,19 +66,21 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 }
     }
 
-    fun applySearchAlbum(searchText: String): Single<List<Album>> {
+    fun applySearchAlbum(searchText: String, limit: Int, offset: Int): Single<List<AlbumVO>> {
         val param = hashMapOf<String, String>()
         param["s"] = searchText
         param["type"] = 10.toString()
-        param["limit"] = 10.toString()
-        param["offset"] = 0.toString()
+        param["limit"] = "$limit"
+        param["offset"] = "$offset"
 
-        return api.searchAlbum(param)
+        val encryptParam = EncryptParamBuilder.encrypt(param)
+
+        return api.searchAlbum(encryptParam)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(CheckResponseCode<SearchAlbumResponse>())
                 .map { response: SearchAlbumResponse ->
-                    response.getAlbums()
+                    response.getAlbumVOs()
                 }
     }
 
@@ -124,7 +128,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 }
     }
 
-    fun applyMusicDetail(musicIds: List<Long>): Single<List<Music>> {
+    fun applyMusicDetail(musicIds: List<Long>): Single<List<MusicRelatedBO>> {
 
         val ids = mutableListOf<MusicDetailParamId>()
         musicIds.forEach {
@@ -140,7 +144,7 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 .subscribeOn(Schedulers.io())
                 .compose(CheckResponseCode<MusicDetailResponse>())
                 .map {
-                    it.getMusics()
+                    it.getMusicRelated()
                 }
     }
 

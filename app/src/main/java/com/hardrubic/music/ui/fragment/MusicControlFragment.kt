@@ -109,9 +109,9 @@ class MusicControlFragment : BaseFragment() {
 
         override fun onPlayState(flag: Boolean) {
             if (flag) {
-                iv_play.setImageResource(android.R.drawable.ic_media_pause)
+                iv_play.setImageResource(R.mipmap.ic_stop_black)
             } else {
-                iv_play.setImageResource(android.R.drawable.ic_media_play)
+                iv_play.setImageResource(R.mipmap.ic_play_black)
             }
         }
     }

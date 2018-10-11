@@ -1,7 +1,6 @@
 package com.hardrubic.music.ui.fragment.search
 
 import android.arch.lifecycle.ViewModelProviders
-import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -10,19 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.ShowExceptionHelper
-import com.hardrubic.music.biz.interf.DialogBtnListener
 import com.hardrubic.music.biz.interf.MusicResourceListener
 import com.hardrubic.music.biz.interf.Searchable
 import com.hardrubic.music.biz.resource.MusicResourceDownload
+import com.hardrubic.music.biz.search.SearchErrorAction
 import com.hardrubic.music.biz.vm.SearchViewModel
-import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
 import com.hardrubic.music.ui.fragment.ProgressDialogFragment
 import com.hardrubic.music.util.LoadingDialogUtil
 import dagger.Lazy
-import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
 import javax.inject.Inject
@@ -37,6 +35,7 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
     }
 
     private lateinit var adapter: ShowMusicAdapter
+    private var currentSearchText = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_search_result_list, container, false)
@@ -55,6 +54,10 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
             val musicVO = (adapter as ShowMusicAdapter).getItem(position)!!
             applySelectMusic(musicVO)
         }
+        adapter.setOnLoadMoreListener({
+            viewModel.searchMoreMusic(currentSearchText, SearchErrorAction(mActivity))
+        }, rv_list)
+        adapter.emptyView = LayoutInflater.from(activity).inflate(R.layout.layout_empty_list_hint, null)
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
         rv_list.addItemDecoration(DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL))
@@ -65,6 +68,9 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
             adapter.setNewData(it)
             LoadingDialogUtil.getInstance().dismissLoadingDialog()
         })
+        viewModel.searchMoreEnd.observe(this, android.arch.lifecycle.Observer {
+            adapter.loadMoreEnd()
+        })
     }
 
     private fun applySelectMusic(musicVO: MusicVO) {
@@ -72,14 +78,15 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
         progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
 
         musicResourceDownload.get().downloadMusicResource(mActivity, listOf(musicVO.musicId), object : MusicResourceListener {
-            override fun onProgress(progress: Int, max: Int) {
-                progressDialogFragment.refreshProgress(progress, max)
-            }
-
-            override fun onSuccess(musics: List<Music>) {
-                viewModel.saveMusics(musics)
+            override fun onSuccess(musicRelatedBOs: List<MusicRelatedBO>) {
+                val musics = musicRelatedBOs.map { it.music }
+                viewModel.saveMusicRelated(musicRelatedBOs)
                 viewModel.playMusics(musics, musics.first().musicId)
                 progressDialogFragment.dismiss()
+            }
+
+            override fun onProgress(progress: Int, max: Int) {
+                progressDialogFragment.refreshProgress(progress, max)
             }
 
             override fun onError(e: Throwable) {
@@ -90,18 +97,7 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
     }
 
     override fun search(text: String) {
-        viewModel.searchMusic(text, Consumer { throwable ->
-            ShowExceptionHelper.show(mActivity, throwable, object : DialogBtnListener {
-                override fun onClickOkListener(dialog: DialogInterface?) {
-                    search(text)
-                    dialog?.dismiss()
-                }
-
-                override fun onClickCancelListener(dialog: DialogInterface?) {
-                    dialog?.dismiss()
-                }
-            })
-            throwable.printStackTrace()
-        })
+        currentSearchText = text
+        viewModel.searchMusic(text, SearchErrorAction(mActivity))
     }
 }

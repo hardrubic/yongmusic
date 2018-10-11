@@ -11,15 +11,16 @@ public interface HttpApi {
     fun login(@FieldMap paramMap: Map<String, String>): Single<LoginResponse>
 
     @FormUrlEncoded
-    @POST("/api/search/pc/")
+    @POST("/weapi/search/get")
+    //@POST("/api/search/pc/")
     fun searchMusic(@FieldMap paramMap: Map<String, String>): Single<SearchMusicResponse>
 
     @FormUrlEncoded
-    @POST("/api/search/pc/")
+    @POST("/weapi/search/get")
     fun searchArtist(@FieldMap paramMap: Map<String, String>): Single<SearchArtistResponse>
 
     @FormUrlEncoded
-    @POST("/api/search/pc/")
+    @POST("/weapi/search/get")
     fun searchAlbum(@FieldMap paramMap: Map<String, String>): Single<SearchAlbumResponse>
 
     @GET("/api/song/enhance/player/url/")

@@ -8,7 +8,7 @@ class SearchMusicResponse : BaseResponse() {
     var result: Result? = null
 
     class Result {
-        lateinit var songs: List<NeteaseMusic>
+        var songs = mutableListOf<NeteaseMusic>()
         var sonCount: Int = -1
     }
 

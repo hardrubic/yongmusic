@@ -42,6 +42,6 @@
         android:layout_height="30dp"
         android:layout_gravity="center"
         android:padding="5dp"
-        android:src="@mipmap/ic_track_black"/>
+        android:src="@mipmap/ic_trash_black"/>
 </LinearLayout>
 

@@ -1,6 +1,6 @@
 package com.hardrubic.music.network.response
 
-import com.hardrubic.music.db.dataobject.Album
+import com.hardrubic.music.entity.vo.AlbumVO
 import com.hardrubic.music.network.response.entity.NeteaseAlbum
 import java.util.*
 
@@ -12,17 +12,14 @@ class SearchAlbumResponse : BaseResponse() {
         var albumCount: Int = -1
     }
 
-    fun getAlbums(): List<Album> {
+    fun getAlbumVOs(): List<AlbumVO> {
         return result?.albums?.map {
-            val album = Album()
-            album.albumId = it.id
-            album.name = it.name
-            album.artistIds = it.artists?.map { it.id }
-            album.artistNames = it.artists?.map { it.name }
-            album.publishTime = it.publishTime
-            album.alias = it.alias
-            album.picUrl = it.picUrl
-            album
+            val vo = AlbumVO(it.id, it.name)
+            vo.picUrl = it.picUrl
+            vo.alias = it.alias ?: listOf()
+            vo.publishTime = it.publishTime
+            vo.artistNames = it.artists?.map { it.name } ?: listOf()
+            vo
         } ?: Collections.emptyList()
     }
 }
