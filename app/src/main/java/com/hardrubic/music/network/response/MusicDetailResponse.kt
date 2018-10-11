@@ -6,8 +6,8 @@ import com.hardrubic.music.network.response.entity.NeteaseMusic2
 class MusicDetailResponse : BaseResponse() {
     var songs: List<NeteaseMusic2>? = null
 
-    fun getMusicRelated(): List<MusicRelatedBO> {
-        return songs?.map { it.getMusic() } ?: listOf()
+    fun getMusicRelated(): MusicRelatedBO {
+        return songs?.first()?.getMusic()!!
     }
 }
 

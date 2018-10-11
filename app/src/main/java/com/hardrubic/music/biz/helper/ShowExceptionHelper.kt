@@ -1,25 +1,23 @@
 package com.hardrubic.music.biz.helper
 
-import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
 import com.hardrubic.music.biz.interf.DialogBtnListener
 import com.hardrubic.music.ui.fragment.ExceptionDialogFragment
 
 object ShowExceptionHelper {
 
-    fun show(activity: FragmentActivity, throwable: Throwable, listener: DialogBtnListener? = null) {
+    //TODO 解决异步情况下的重复显示
+    @Synchronized
+    fun show(activity: AppCompatActivity, throwable: Throwable, listener: DialogBtnListener? = null): ExceptionDialogFragment? {
         if (activity.isFinishing) {
-            return
-        }
-
-        val fm = activity.supportFragmentManager
-
-        val old = fm.findFragmentByTag(ExceptionDialogFragment.TAG)
-        if (old != null) {
-            fm.beginTransaction().remove(old).commit()
+            return null
         }
 
         val bizExceptionDialogFragment = ExceptionDialogFragment(throwable, listener)
-        bizExceptionDialogFragment.show(fm, ExceptionDialogFragment.TAG)
-        //fm.executePendingTransactions() //阻塞直到完成
+        val transaction = activity.supportFragmentManager.beginTransaction()
+        transaction.add(bizExceptionDialogFragment, ExceptionDialogFragment.TAG)
+        transaction.addToBackStack(null)
+        transaction.commitAllowingStateLoss()
+        return bizExceptionDialogFragment
     }
 }

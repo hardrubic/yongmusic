@@ -1,12 +1,14 @@
 package com.hardrubic.music.ui.fragment
 
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
+import com.hardrubic.music.R.id.rv_list
 import com.hardrubic.music.entity.vo.AlbumVO
 import com.hardrubic.music.ui.activity.AlbumDetailActivity
 import com.hardrubic.music.ui.adapter.show.ShowAlbumAdapter
@@ -35,5 +37,6 @@ class ArtistAlbumFragment : BaseFragment() {
         }
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
+        rv_list.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
     }
 }

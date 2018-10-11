@@ -1,12 +1,13 @@
-package com.hardrubic.music.util
+package com.hardrubic.music.util.file
 
 import android.content.Context
 import android.os.Environment
+import com.hardrubic.music.Constant
 import java.io.File
 
-object FileUtil {
+object FilePathUtil {
     fun getAppDir(context: Context): String {
-        return "${Environment.getExternalStorageDirectory().absolutePath}${File.separator}absMusic${File.separator}"
+        return "${Environment.getExternalStorageDirectory().absolutePath}${File.separator}${Constant.APP_NAME}${File.separator}"
     }
 
     fun getMusicCacheDir(context: Context): String {

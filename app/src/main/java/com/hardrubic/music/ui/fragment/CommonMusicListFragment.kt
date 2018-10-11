@@ -11,7 +11,6 @@ import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.MusicHelper
-import com.hardrubic.music.biz.helper.ShowExceptionHelper
 import com.hardrubic.music.biz.interf.MusicResourceListener
 import com.hardrubic.music.biz.resource.MusicResourceDownload
 import com.hardrubic.music.biz.vm.CommonMusicListViewModel
@@ -37,6 +36,8 @@ class CommonMusicListFragment : BaseFragment() {
     @Inject
     lateinit var musicResourceDownload: Lazy<MusicResourceDownload>
 
+    private var exceptionDialogFragment: ExceptionDialogFragment? = null
+
     private val viewModel: CommonMusicListViewModel by lazy {
         ViewModelProviders.of(mActivity, viewModelFactory).get(CommonMusicListViewModel::class.java)
     }
@@ -57,12 +58,12 @@ class CommonMusicListFragment : BaseFragment() {
         headView.listener = object : OnMusicBatchHeaderViewListener {
             override fun selectAll() {
                 val adapter = rv_list.adapter as ShowMusicAdapter
-                val musicIds = adapter.data.filter { it.valid }.map { it.musicId }
-                if (musicIds.isEmpty()) {
+                val validMusicIds = adapter.data.filter { it.valid }.map { it.musicId }
+                if (validMusicIds.isEmpty()) {
                     return
                 }
 
-                applySelectMusic(musicIds) { it ->
+                applySelectMusic(validMusicIds) { it ->
                     viewModel.playMusics(it)
                 }
             }
@@ -86,15 +87,16 @@ class CommonMusicListFragment : BaseFragment() {
         rv_list.addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))
     }
 
-    private fun applySelectMusic(initialMusicIds: List<Long>, successCallback: (musics: List<Music>) -> Unit) {
+    private fun applySelectMusic(musicIds: List<Long>, successCallback: (musics: List<Music>) -> Unit) {
         if (network) {
             val progressDialogFragment = ProgressDialogFragment()
             progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
 
-            musicResourceDownload.get().downloadMusicResource(mActivity, initialMusicIds, object : MusicResourceListener {
+            musicResourceDownload.get().downloadMusicResource(mActivity, musicIds, object : MusicResourceListener {
                 override fun onSuccess(musicRelatedBOs: List<MusicRelatedBO>) {
                     viewModel.saveMusicRelated(musicRelatedBOs)
-                    successCallback.invoke(MusicHelper.sortMusicByInitialId(musicRelatedBOs.map { it.music }, initialMusicIds))
+                    val musics = musicRelatedBOs.map { it.music }
+                    successCallback.invoke(MusicHelper.sortMusicByTargetId(musics, musicIds))
                     progressDialogFragment.dismiss()
                 }
 
@@ -104,13 +106,29 @@ class CommonMusicListFragment : BaseFragment() {
 
                 override fun onError(e: Throwable) {
                     progressDialogFragment.dismiss()
-                    ShowExceptionHelper.show(mActivity, e)
+
+                    //TODO test
+                    if (musicIds.size == 1) {
+                        showErrorDialog(e)
+                    } else {
+                        e.printStackTrace()
+                    }
                 }
             })
         } else {
-            val musics = viewModel.queryMusics(initialMusicIds)
-            successCallback.invoke(MusicHelper.sortMusicByInitialId(musics, initialMusicIds))
+            val musics = viewModel.queryMusics(musicIds)
+            successCallback.invoke(MusicHelper.sortMusicByTargetId(musics, musicIds))
         }
+    }
+
+    @Synchronized
+    private fun showErrorDialog(e: Throwable) {
+        //TODO 待统一弹窗
+        if (exceptionDialogFragment != null && exceptionDialogFragment!!.isAdded) {
+            return
+        }
+        exceptionDialogFragment = ExceptionDialogFragment(e, null)
+        exceptionDialogFragment?.showNow(mActivity.supportFragmentManager, ExceptionDialogFragment.TAG)
     }
 
     companion object {

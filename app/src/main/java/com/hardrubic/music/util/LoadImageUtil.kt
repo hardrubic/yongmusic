@@ -9,7 +9,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.RequestOptions.*
+import com.bumptech.glide.request.RequestOptions.diskCacheStrategyOf
+import com.bumptech.glide.request.RequestOptions.errorOf
 import com.hardrubic.music.R
 
 
@@ -30,7 +31,7 @@ object LoadImageUtil {
     private fun loadImage(requestBuilder: RequestBuilder<Drawable>, imageView: ImageView, requestOptions: RequestOptions? = null) {
         requestBuilder
                 .apply(diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
-                .apply(placeholderOf(R.mipmap.ic_empty_cover))
+                //.apply(placeholderOf(R.mipmap.ic_empty_cover))
                 .apply(errorOf(R.mipmap.ic_empty_cover))
         if (requestOptions != null) {
             requestBuilder.apply(requestOptions)

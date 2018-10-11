@@ -22,8 +22,8 @@
             android:layout_width="300dp"
             android:layout_height="300dp"
             android:scaleType="fitXY"
-            android:src="@mipmap/ic_empty_cover"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true"
+            tools:src="@mipmap/ic_empty_cover"/>
     </RelativeLayout>
 
     <LinearLayout

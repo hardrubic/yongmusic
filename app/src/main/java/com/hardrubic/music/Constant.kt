@@ -5,7 +5,7 @@ class Constant {
         const val LOVE_COLLECTION_ID = 0L
         const val LOCAL_MUSIC_MINIMUM_SIZE = 1024 * 1024 //1M
         const val LOCAL_MUSIC_MINIMUM_SECOND = 60 * 1000 //1分钟
-        const val APP_NAME = "yong"
+        const val APP_NAME = "yongmusic"
     }
 
     object Param {

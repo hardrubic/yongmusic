@@ -3,11 +3,13 @@ package com.hardrubic.music.network
 import com.google.gson.Gson
 import com.hardrubic.music.biz.encrypt.EncryptParamBuilder
 import com.hardrubic.music.db.dataobject.Artist
+import com.hardrubic.music.entity.MusicDetailParamId
 import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.entity.bo.MusicResourceBO
 import com.hardrubic.music.entity.vo.AlbumVO
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.network.response.*
+import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -128,12 +130,10 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 }
     }
 
-    fun applyMusicDetail(musicIds: List<Long>): Single<List<MusicRelatedBO>> {
-
+    //TODO 支持批量吗
+    fun applyMusicDetail(musicId: Long, scheduler: Scheduler): Single<MusicRelatedBO> {
         val ids = mutableListOf<MusicDetailParamId>()
-        musicIds.forEach {
-            ids.add(MusicDetailParamId(it))
-        }
+        ids.add(MusicDetailParamId(musicId))
 
         val param = hashMapOf<String, String>()
         param["c"] = Gson().toJson(ids)
@@ -141,11 +141,9 @@ class HttpService @Inject constructor(val api: HttpApi) {
         val encryptParam = EncryptParamBuilder.encrypt(param)
 
         return api.musicDetail(encryptParam)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(scheduler)
                 .compose(CheckResponseCode<MusicDetailResponse>())
-                .map {
-                    it.getMusicRelated()
-                }
+                .map { it.getMusicRelated() }
     }
 
     fun applyAlbumDetail(albumId: Long): Single<AlbumDetailResponse> {
@@ -160,5 +158,4 @@ class HttpService @Inject constructor(val api: HttpApi) {
                 .compose(CheckResponseCode())
     }
 
-    private class MusicDetailParamId(val id: Long)
 }
