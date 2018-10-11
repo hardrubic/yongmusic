@@ -28,9 +28,36 @@
             android:id="@+id/tv_save_to_collection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:padding="10dp"
+            android:gravity="center_vertical"
             android:text="@string/save_to_collection"
+            android:textColor="@color/primary_text_color"
+            android:textSize="@dimen/secondary_text_size"/>
+
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"/>
+
+        <TextView
+            android:id="@+id/tv_view_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/view_artist"
+            android:textColor="@color/primary_text_color"
+            android:textSize="@dimen/secondary_text_size"/>
+
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"/>
+
+        <TextView
+            android:id="@+id/tv_view_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/view_album"
+            android:textColor="@color/primary_text_color"
             android:textSize="@dimen/secondary_text_size"/>
 
     </LinearLayout>

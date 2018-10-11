@@ -52,7 +52,7 @@ class PreferencesUtil private constructor(context: Context) {
     }
 
     fun deleteKey(key: String) {
-        defaultSp.edit().remove(key)
+        defaultSp.edit().remove(key).commit()
     }
 
     companion object {

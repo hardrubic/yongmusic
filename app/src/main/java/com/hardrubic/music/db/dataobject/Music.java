@@ -3,12 +3,12 @@ package com.hardrubic.music.db.dataobject;
 import com.hardrubic.music.network.converter.IdsConverter;
 import com.hardrubic.music.network.converter.NamesConverter;
 import java.util.List;
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Keep;
-import org.greenrobot.greendao.annotation.Transient;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.ToOne;
 
 @Entity
 public class Music {
@@ -26,10 +26,16 @@ public class Music {
     private Boolean local;//本地music
     private Boolean download;//下载music
 
-    @Transient
-    private List<Artist> artists;
-    @Transient
+    @ToOne(joinProperty = "albumId")
     private Album album;
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+    /** Used for active entity operations. */
+    @Generated(hash = 1255683360)
+    private transient MusicDao myDao;
+    @Generated(hash = 381107260)
+    private transient Long album__resolvedKey;
 
     @Generated(hash = 471745276)
     public Music(Long musicId, String name, String path, List<Long> artistIds,
@@ -49,26 +55,6 @@ public class Music {
 
     @Generated(hash = 1263212761)
     public Music() {
-    }
-
-    @Keep
-    public List<Artist> getArtists() {
-        return artists;
-    }
-
-    @Keep
-    public void setArtists(List<Artist> artists) {
-        this.artists = artists;
-    }
-
-    @Keep
-    public Album getAlbum() {
-        return album;
-    }
-
-    @Keep
-    public void setAlbum(Album album) {
-        this.album = album;
     }
 
     public Long getMusicId() {
@@ -149,6 +135,78 @@ public class Music {
 
     public void setDownload(Boolean download) {
         this.download = download;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 1001254595)
+    public Album getAlbum() {
+        Long __key = this.albumId;
+        if (album__resolvedKey == null || !album__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            AlbumDao targetDao = daoSession.getAlbumDao();
+            Album albumNew = targetDao.load(__key);
+            synchronized (this) {
+                album = albumNew;
+                album__resolvedKey = __key;
+            }
+        }
+        return album;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 770122782)
+    public void setAlbum(Album album) {
+        synchronized (this) {
+            this.album = album;
+            albumId = album == null ? null : album.getAlbumId();
+            album__resolvedKey = albumId;
+        }
+    }
+
+    /**
+     * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
+     * Entity must attached to an entity context.
+     */
+    @Generated(hash = 128553479)
+    public void delete() {
+        if (myDao == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+        myDao.delete(this);
+    }
+
+    /**
+     * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
+     * Entity must attached to an entity context.
+     */
+    @Generated(hash = 1942392019)
+    public void refresh() {
+        if (myDao == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+        myDao.refresh(this);
+    }
+
+    /**
+     * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
+     * Entity must attached to an entity context.
+     */
+    @Generated(hash = 713229351)
+    public void update() {
+        if (myDao == null) {
+            throw new DaoException("Entity is detached from DAO context");
+        }
+        myDao.update(this);
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1218270154)
+    public void __setDaoSession(DaoSession daoSession) {
+        this.daoSession = daoSession;
+        myDao = daoSession != null ? daoSession.getMusicDao() : null;
     }
 
 }

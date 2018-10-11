@@ -2,6 +2,7 @@ package com.hardrubic.music.biz.repository
 
 import com.hardrubic.music.db.DbManager
 import com.hardrubic.music.db.dataobject.*
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import javax.inject.Inject
 
 class MusicRepository @Inject constructor() {
@@ -16,6 +17,17 @@ class MusicRepository @Inject constructor() {
 
     private val recentDao: RecentDao
         get() = DbManager.instance.session.recentDao
+
+    fun saveMusicRelated(relatedBO: List<MusicRelatedBO>) {
+        val artistSet = mutableSetOf<Artist>()
+        relatedBO.map { it.artists }.forEach {
+            artistSet.addAll(it)
+        }
+
+        addMusic(relatedBO.map { it.music })
+        addAlbum(relatedBO.mapNotNull { it.album })
+        addArtist(artistSet.toList())
+    }
 
     fun queryMusic(id: Long): Music? {
         return musicDao.load(id)
@@ -39,15 +51,6 @@ class MusicRepository @Inject constructor() {
 
     fun addMusic(musics: List<Music>) {
         musicDao.insertOrReplaceInTx(musics)
-
-        for (music in musics) {
-            if (music.album != null) {
-                addAlbum(music.album)
-            }
-            if (music.artists != null && music.artists.isNotEmpty()) {
-                addArtist(music.artists)
-            }
-        }
     }
 
     fun deleteMusic(id: Long) {

@@ -1,7 +1,7 @@
 package com.hardrubic.music.biz.adapter
 
-import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.entity.vo.MusicVO
 
 object MusicEntityAdapter {
@@ -16,8 +16,8 @@ object MusicEntityAdapter {
 
     fun toMusicVO(music: Music): MusicVO {
         return MusicVO(music.musicId, music.name).apply {
-            artistNames = music.artists?.map { it.name } ?: listOf()
-            albumName = music.album?.name ?: ""
+            artistNames = music.artistNames
+            albumName = music.albumName
         }
     }
 }

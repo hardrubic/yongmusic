@@ -2,7 +2,9 @@ package com.hardrubic.music.ui.activity
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import com.hardrubic.music.Constant
@@ -147,5 +149,13 @@ class ArtistDetailActivity : BaseActivity() {
             })
             throwable.printStackTrace()
         })
+    }
+
+    companion object {
+        fun start(context: Context, artistId: Long) {
+            context.startActivity(Intent(context, ArtistDetailActivity::class.java).apply {
+                putExtra(Constant.Param.ARTIST_ID, artistId)
+            })
+        }
     }
 }

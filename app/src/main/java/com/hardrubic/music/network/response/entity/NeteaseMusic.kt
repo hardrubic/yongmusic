@@ -20,10 +20,8 @@ class NeteaseMusic {
         music.duration = duration
         music.artistIds = artists?.map { it.id }
         music.artistNames = artists?.map { it.name }
-        music.artists = getArtist()
         music.albumId = getAlbum()?.albumId
         music.albumName = getAlbum()?.name
-        music.album = getAlbum()
         music.path = ""
         music.download = false
         music.local = false

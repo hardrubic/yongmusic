@@ -4,12 +4,14 @@ import com.google.gson.annotations.SerializedName
 import com.hardrubic.music.db.dataobject.Album
 import com.hardrubic.music.db.dataobject.Artist
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.entity.vo.MusicVO
 import java.util.*
 
 class NeteaseMusic2 {
     var id = -1L
     var name = ""
+    var privilege: NeteasePrivilege? = null
     @SerializedName("ar")
     var artist: List<NeteaseMusic2Artist>? = null
     @SerializedName("al")
@@ -21,24 +23,31 @@ class NeteaseMusic2 {
         val vo = MusicVO(id, name)
         vo.artistNames = artist?.map { it.name } ?: listOf<String>()
         vo.albumName = album?.name ?: ""
+        vo.valid = privilege?.state!! >= 0
         return vo
     }
 
-    fun getMusic(): Music {
+    fun getMusic(): MusicRelatedBO {
         val music = Music()
         music.musicId = id
         music.name = name
         music.path = ""
-        music.album = getAlbum()
         music.albumId = album?.id
         music.albumName = album?.name
-        music.artists = getArtists()
         music.artistIds = artist?.map { it.id }
         music.artistNames = artist?.map { it.name }
         music.duration = duration
         music.local = false
         music.download = false
-        return music
+
+        val album = getAlbum()
+        val artists = getArtists()
+
+        val saveMusic = MusicRelatedBO(music)
+        saveMusic.album = album
+        saveMusic.artists = artists
+
+        return saveMusic
     }
 
     fun getArtists(): List<Artist> {
@@ -76,5 +85,10 @@ class NeteaseMusic2 {
             album.picUrl = picUrl
             return album
         }
+    }
+
+    class NeteasePrivilege {
+        @SerializedName("st")
+        var state = 0
     }
 }

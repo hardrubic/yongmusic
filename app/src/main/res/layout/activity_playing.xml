@@ -11,22 +11,20 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         style="@style/ToolbarStyle"
-        android:background="@color/black" />
+        android:background="@color/black"/>
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" >
-
+        android:layout_weight="1">
         <com.hardrubic.music.ui.widget.CDView
             android:id="@+id/iv_cover"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_margin="50dp"
-            android:scaleType="fitCenter"
-            android:src="@mipmap/ic_empty_cover"/>
-    </FrameLayout>
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/ic_empty_cover"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,21 +38,24 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:padding="10dp"
             android:src="@mipmap/ic_love_white"/>
 
         <ImageView
-            android:id="@+id/iv_download"
+            android:id="@+id/iv_share"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_download" />
+            android:padding="12dp"
+            android:src="@mipmap/ic_share"/>
 
         <ImageView
             android:id="@+id/iv_more"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@mipmap/ic_more" />
+            android:padding="10dp"
+            android:src="@mipmap/ic_more"/>
     </LinearLayout>
 
     <LinearLayout
@@ -100,6 +101,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:padding="12dp"
             android:src="@mipmap/ic_model_by_list"/>
 
         <ImageView
@@ -107,30 +109,32 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@android:drawable/ic_media_previous"/>
+            android:padding="10dp"
+            android:src="@mipmap/ic_pre_play"/>
 
         <ImageView
             android:id="@+id/iv_play"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@android:drawable/ic_media_play"/>
+            android:padding="10dp"
+            android:src="@mipmap/ic_play_white"/>
 
         <ImageView
             android:id="@+id/iv_next"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@android:drawable/ic_media_next"/>
+            android:padding="10dp"
+            android:src="@mipmap/ic_next_play"/>
 
         <ImageView
             android:id="@+id/iv_list"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:src="@mipmap/ic_play_list"/>
+            android:padding="12dp"
+            android:src="@mipmap/ic_play_list_white"/>
     </LinearLayout>
 
 </LinearLayout>

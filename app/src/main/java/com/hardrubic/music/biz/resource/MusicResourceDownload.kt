@@ -1,8 +1,9 @@
 package com.hardrubic.music.biz.resource
 
 import android.content.Context
+import com.hardrubic.music.R
 import com.hardrubic.music.biz.interf.MusicResourceListener
-import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.entity.bo.MusicResourceBO
 import com.hardrubic.music.network.HttpService
 import com.hardrubic.music.util.FileUtil
@@ -52,34 +53,59 @@ class MusicResourceDownload(val httpService: HttpService) {
         }
 
         thread {
-            val countDownLatch = CountDownLatch(2)
-            var saveMusics = listOf<Music>()
-            var musicResourceBOs = listOf<MusicResourceBO>()
+            var musicRelatedBOs = listOf<MusicRelatedBO>()
+            var musicResourceBOs = mutableListOf<MusicResourceBO>()
 
-            httpService.applyMusicDetail(musicIds)
-                    .subscribe(Consumer {
-                        saveMusics = it
-                        refreshProgress(ProgressWeight.MUSIC_DETAIL.toFloat())
-                        countDownLatch.countDown()
-                    }, Consumer {
-                        musicResourceListener?.onError(it)
-                    })
-
+            //step1 resource info
+            var countDownLatch = CountDownLatch(1)
             httpService.applyMusicResource(musicIds)
                     .subscribe(Consumer {
-                        downloadFileSync(context, it, musicFileDownloadListener)
-                        musicResourceBOs = it
+                        musicResourceBOs = it.toMutableList()
+                        val failMusicIds = verifyResource(musicResourceBOs)
+                        if (failMusicIds.size == it.size) {
+                            musicFileDownloadListener.onError(Exception("${context.getString(R.string.hint_download_fail)}"))
+                            return@Consumer
+                        }
+
                         refreshProgress(ProgressWeight.MUSIC_RESOURCE.toFloat())
                         countDownLatch.countDown()
                     }, Consumer {
                         musicResourceListener?.onError(it)
                     })
-
             countDownLatch.await()
 
-            fillResource2Music(saveMusics, musicResourceBOs)
-            musicResourceListener?.onSuccess(saveMusics)
+            //step2 music detail
+            countDownLatch = CountDownLatch(1)
+            val resourceOkMusicIds = musicResourceBOs.map { it.musicId }
+            httpService.applyMusicDetail(resourceOkMusicIds)
+                    .subscribe(Consumer {
+                        musicRelatedBOs = it
+
+                        refreshProgress(ProgressWeight.MUSIC_DETAIL.toFloat())
+                        countDownLatch.countDown()
+                    }, Consumer {
+                        musicResourceListener?.onError(it)
+                    })
+            countDownLatch.await()
+
+            //step3 music file
+            downloadFileSync(context, musicResourceBOs, musicFileDownloadListener)
+            fillResource2Music(musicRelatedBOs, musicResourceBOs)
+            musicResourceListener?.onSuccess(musicRelatedBOs)
         }
+    }
+
+    private fun verifyResource(list: MutableList<MusicResourceBO>): List<Long> {
+        val failMusicIds = mutableListOf<Long>()
+        val iterator = list.iterator()
+        while (iterator.hasNext()) {
+            val entity = iterator.next()
+            if ((entity.url == null || entity.url!!.isEmpty()) && (entity.md5 == null || entity.md5!!.isEmpty())) {
+                failMusicIds.add(entity.musicId)
+                iterator.remove()
+            }
+        }
+        return failMusicIds
     }
 
     private fun downloadFileSync(context: Context, bos: List<MusicResourceBO>, musicFileDownloadListener: MusicFileDownloadListener) {
@@ -89,17 +115,8 @@ class MusicResourceDownload(val httpService: HttpService) {
         val countDownLatch = CountDownLatch(total)
         //LogUtil.d("begin download music,size ${bos.size}")
         for (bo in bos) {
-            val url = bo.url
-            if (url == null || url.isEmpty()) {
-                musicFileDownloadListener.onError(Exception("url null"))
-                return
-            }
-
-            val saveName = bo.md5
-            if (saveName == null || saveName.isEmpty()) {
-                musicFileDownloadListener.onError(Exception("md5 null"))
-                return
-            }
+            val url = bo.url!!
+            val saveName = bo.md5!!
 
             bo.path = saveDir + saveName
             val mission = Mission(url, saveName, saveDir)
@@ -122,11 +139,11 @@ class MusicResourceDownload(val httpService: HttpService) {
         //LogUtil.d("finish download music")
     }
 
-    private fun fillResource2Music(musics: List<Music>, bos: List<MusicResourceBO>) {
-        for (music in musics) {
-            val bo = bos.find { it.musicId == music.musicId } ?: continue
+    private fun fillResource2Music(relatedBOs: List<MusicRelatedBO>, resourceBOs: List<MusicResourceBO>) {
+        for (relatedBO in relatedBOs) {
+            val bo = resourceBOs.find { it.musicId == relatedBO.music.musicId } ?: continue
 
-            music.path = bo.path
+            relatedBO.music.path = bo.path
         }
     }
 

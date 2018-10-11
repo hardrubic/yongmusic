@@ -6,4 +6,5 @@ class MusicVO(val musicId: Long, val name: String) : Serializable {
     var artistNames = listOf<String>()
     var albumName = ""
     var duration = -1
+    var valid = true
 }

@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.helper.MusicHelper
@@ -15,6 +16,7 @@ import com.hardrubic.music.biz.interf.MusicResourceListener
 import com.hardrubic.music.biz.resource.MusicResourceDownload
 import com.hardrubic.music.biz.vm.CommonMusicListViewModel
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.widget.view.MusicBatchHeaderView
@@ -55,7 +57,7 @@ class CommonMusicListFragment : BaseFragment() {
         headView.listener = object : OnMusicBatchHeaderViewListener {
             override fun selectAll() {
                 val adapter = rv_list.adapter as ShowMusicAdapter
-                val musicIds = adapter.data.map { it.musicId }
+                val musicIds = adapter.data.filter { it.valid }.map { it.musicId }
                 if (musicIds.isEmpty()) {
                     return
                 }
@@ -70,6 +72,10 @@ class CommonMusicListFragment : BaseFragment() {
         adapter.addHeaderView(headView)
         adapter.setOnItemClickListener { adapter, view, position ->
             val musicVO = (adapter as ShowMusicAdapter).getItem(position)!!
+            if (!musicVO.valid) {
+                Toast.makeText(mActivity, R.string.hint_music_invalid, Toast.LENGTH_LONG).show()
+                return@setOnItemClickListener
+            }
 
             applySelectMusic(listOf(musicVO.musicId)) {
                 viewModel.playMusic(musicVO.musicId)
@@ -86,14 +92,14 @@ class CommonMusicListFragment : BaseFragment() {
             progressDialogFragment.show(mActivity.supportFragmentManager.beginTransaction(), ProgressDialogFragment.TAG)
 
             musicResourceDownload.get().downloadMusicResource(mActivity, initialMusicIds, object : MusicResourceListener {
-                override fun onProgress(progress: Int, max: Int) {
-                    progressDialogFragment.refreshProgress(progress, max)
+                override fun onSuccess(musicRelatedBOs: List<MusicRelatedBO>) {
+                    viewModel.saveMusicRelated(musicRelatedBOs)
+                    successCallback.invoke(MusicHelper.sortMusicByInitialId(musicRelatedBOs.map { it.music }, initialMusicIds))
+                    progressDialogFragment.dismiss()
                 }
 
-                override fun onSuccess(musics: List<Music>) {
-                    viewModel.saveMusics(musics)
-                    successCallback.invoke(MusicHelper.sortMusicByInitialId(musics, initialMusicIds))
-                    progressDialogFragment.dismiss()
+                override fun onProgress(progress: Int, max: Int) {
+                    progressDialogFragment.refreshProgress(progress, max)
                 }
 
                 override fun onError(e: Throwable) {

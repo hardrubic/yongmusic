@@ -1,6 +1,6 @@
 package com.hardrubic.music.ui.adapter.show
 
-import android.text.format.Formatter
+import android.support.v4.content.ContextCompat
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.hardrubic.music.R
@@ -25,6 +25,17 @@ class ShowMusicAdapter(data: List<MusicVO>)
         } else {
             baseViewHolder.setGone(R.id.tv_duration, false)
         }
+
+        if (vo.valid) {
+            baseViewHolder.setTextColor(R.id.tv_name, ContextCompat.getColor(mContext, R.color.primary_text_color))
+        } else {
+            baseViewHolder.setTextColor(R.id.tv_name, ContextCompat.getColor(mContext, R.color.second_text_color))
+        }
+    }
+
+    fun addMoreData(vos: List<MusicVO>) {
+        data.addAll(vos)
+        notifyDataSetChanged()
     }
 
 }

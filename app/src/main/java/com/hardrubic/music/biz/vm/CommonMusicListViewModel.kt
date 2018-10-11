@@ -9,6 +9,7 @@ import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Music
+import com.hardrubic.music.entity.bo.MusicRelatedBO
 import com.hardrubic.music.service.MusicServiceControl
 import javax.inject.Inject
 
@@ -18,8 +19,8 @@ class CommonMusicListViewModel @Inject constructor(val application: Application,
         return musicRepository.queryMusic(musicIds)
     }
 
-    fun saveMusics(musics: List<Music>) {
-        musicRepository.addMusic(musics)
+    fun saveMusicRelated(relatedBO: List<MusicRelatedBO>) {
+        musicRepository.saveMusicRelated(relatedBO)
     }
 
     fun playMusic(musicId: Long) {

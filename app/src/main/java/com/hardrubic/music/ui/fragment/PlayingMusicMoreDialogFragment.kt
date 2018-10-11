@@ -11,7 +11,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.R
+import com.hardrubic.music.biz.vm.AlbumDetailViewModel
 import com.hardrubic.music.biz.vm.PlayingViewModel
+import com.hardrubic.music.ui.activity.AlbumDetailActivity
+import com.hardrubic.music.ui.activity.ArtistDetailActivity
 import com.hardrubic.music.ui.activity.SelectCollectionActivity
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_playing_musc_more.*
@@ -19,8 +22,12 @@ import javax.inject.Inject
 
 class PlayingMusicMoreDialogFragment : AppCompatDialogFragment() {
 
-    private val viewModel by lazy {
+    private val playingViewModel by lazy {
         ViewModelProviders.of(activity!!, viewModelFactory).get(PlayingViewModel::class.java)
+    }
+
+    private val albumDetailViewModel: AlbumDetailViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(AlbumDetailViewModel::class.java)
     }
 
     @Inject
@@ -45,12 +52,34 @@ class PlayingMusicMoreDialogFragment : AppCompatDialogFragment() {
     }
 
     private fun initView() {
-        val playingMusic = viewModel.playingMusic!!
+        val playingMusic = playingViewModel.playingMusic!!
         tv_name.text = playingMusic.name
 
         tv_save_to_collection.setOnClickListener {
             SelectCollectionActivity.start(activity!!, playingMusic.musicId)
             dismiss()
+        }
+
+        if (!playingMusic.local) {
+            val artistName = playingMusic.artistNames.joinToString(separator = ",")
+            tv_view_artist.text = "${getString(R.string.view_artist)}:$artistName"
+            tv_view_artist.setOnClickListener {
+                val firstArtistId = playingMusic.artistIds.first()
+                ArtistDetailActivity.start(activity!!, firstArtistId)
+                dismiss()
+            }
+        } else {
+            tv_view_artist.text = "${getString(R.string.view_artist)}:--"
+        }
+
+        if (!playingMusic.local && playingMusic.album != null) {
+            tv_view_album.text = "${getString(R.string.view_album)}:${playingMusic.albumName}"
+            tv_view_album.setOnClickListener {
+                AlbumDetailActivity.start(activity!!, playingMusic.albumId)
+                dismiss()
+            }
+        } else {
+            tv_view_album.text = "${getString(R.string.view_album)}:--"
         }
     }
 
