@@ -24,7 +24,7 @@ class MusicRepository @Inject constructor() {
             artistSet.addAll(it)
         }
 
-        addMusic(relatedBO.map { it.music })
+        addMusic(relatedBO.mapNotNull { it.music })
         addAlbum(relatedBO.mapNotNull { it.album })
         addArtist(artistSet.toList())
     }

@@ -2,10 +2,10 @@ package com.hardrubic.music.biz.vm
 
 import android.app.Application
 import android.arch.lifecycle.ViewModel
-import com.hardrubic.music.biz.command.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
-import com.hardrubic.music.biz.command.ReplaceMusicsCommand
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
+import com.hardrubic.music.biz.command.list.AddMusicsCommand
+import com.hardrubic.music.biz.command.list.ReplaceMusicsCommand
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
 import com.hardrubic.music.db.dataobject.Music

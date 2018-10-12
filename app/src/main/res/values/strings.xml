@@ -1,9 +1,8 @@
 <resources>
-    <string name="app_name">希望音乐</string>
     <string name="navigation_drawer_open">打开侧滑</string>
     <string name="navigation_drawer_close">关闭侧滑</string>
-    <string name="nav_header_title">hardrubic</string>
-    <string name="nav_header_subtitle">dgzx106@163.com</string>
+    <string name="nav_header_title">title</string>
+    <string name="nav_header_subtitle">subtitle</string>
 
     <string name="search">搜索</string>
     <string name="my">我的</string>
@@ -50,6 +49,8 @@
     <string name="downloading">下载中</string>
     <string name="view_artist">查看歌手</string>
     <string name="view_album">查看专辑</string>
+    <string name="version_update">版本更新</string>
+    <string name="check_update">检查更新</string>
 
     <string name="hint_add_music_to_collection_success">成功添加音乐到:%1$s</string>
     <string name="hint_collection_name">请输入歌单标题</string>
@@ -57,6 +58,7 @@
     <string name="hint_download_fail">下载失败</string>
     <string name="hint_music_invalid">歌曲不可用</string>
     <string name="hint_no_data">没有数据</string>
+    <string name="hint_no_new_version">已经是最新版本</string>
 
     <!-- 登录 -->
     <string name="login_in">登录</string>

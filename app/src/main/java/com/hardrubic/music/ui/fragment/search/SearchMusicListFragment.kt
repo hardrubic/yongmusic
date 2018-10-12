@@ -79,7 +79,7 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
 
         musicResourceDownload.get().downloadMusicResource(mActivity, listOf(musicVO.musicId), object : MusicResourceListener {
             override fun onSuccess(musicRelatedBOs: List<MusicRelatedBO>) {
-                val musics = musicRelatedBOs.map { it.music }
+                val musics = musicRelatedBOs.map { it.music!! }
                 viewModel.saveMusicRelated(musicRelatedBOs)
                 viewModel.playMusics(musics, musics.first().musicId)
                 progressDialogFragment.dismiss()

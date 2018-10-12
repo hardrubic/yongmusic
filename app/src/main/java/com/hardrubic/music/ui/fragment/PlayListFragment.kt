@@ -15,9 +15,7 @@ import android.view.ViewGroup
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.command.LoopCommand
 import com.hardrubic.music.biz.command.RemoteControl
-import com.hardrubic.music.biz.command.StopCommand
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
-import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.helper.PlayModelHelper
 import com.hardrubic.music.biz.vm.PlayListViewModel
 import com.hardrubic.music.db.dataobject.Music
@@ -80,14 +78,22 @@ class PlayListFragment : AppCompatDialogFragment() {
         adapter.setOnItemClickListener { adapter, view, position ->
             adapter as PlayListAdapter
             val music = adapter.getItem(position)!!
-            selectMusic(music)
+            adapter.playingMusicId = music.musicId
+            adapter.notifyDataSetChanged()
+            viewModel.selectMusic(music)
         }
         adapter.setOnItemChildClickListener { adapter, view, position ->
             adapter as PlayListAdapter
             val music = adapter.getItem(position)!!
 
             when (view.id) {
-                R.id.iv_delete -> deleteMusic(music, position)
+                R.id.iv_delete -> {
+                    if (adapter.itemCount == 1) {
+                        deleteAllMusic()
+                    } else {
+                        deleteMusic(music, position)
+                    }
+                }
             }
         }
         adapter.playingMusicId = CurrentPlayingHelper.getPlayingMusicId()
@@ -100,45 +106,18 @@ class PlayListFragment : AppCompatDialogFragment() {
         adapter.setNewData(list)
     }
 
-    private fun selectMusic(music: Music) {
-        adapter.playingMusicId = music.musicId
+    private fun deleteMusic(music: Music, position: Int) {
+        adapter.remove(position)
         adapter.notifyDataSetChanged()
 
-        viewModel.selectMusic(music)
-    }
-
-    private fun deleteMusic(music: Music, position: Int) {
-        PlayListHelper.delete(music)
-
-        if (adapter.itemCount == 1) {
-            deleteAllMusic()
-        } else {
-            var playing = false
-            MusicServiceControl.runInMusicService(activity!!, {
-                playing = it.isPlaying()
-            })
-            if (adapter.playingMusicId == music.musicId && playing) {
-                val nextMusicPosition = if (position == adapter.data.lastIndex) {
-                    0
-                } else {
-                    position + 1
-                }
-                val nextMusic = adapter.getItem(nextMusicPosition)!!
-                selectMusic(nextMusic)
-            }
-            adapter.remove(position)
-        }
+        viewModel.deleteMusic(music.musicId)
     }
 
     private fun deleteAllMusic() {
         adapter.playingMusicId = null
         adapter.setNewData(Collections.emptyList())
-        PlayListHelper.deleteAll()
-        CurrentPlayingHelper.setPlayingMusicId(null)
 
-        MusicServiceControl.runInMusicService(activity!!) {
-            RemoteControl.executeCommand(StopCommand(it))
-        }
+        viewModel.deleteAllMusic()
     }
 
     private fun changePlayModel() {

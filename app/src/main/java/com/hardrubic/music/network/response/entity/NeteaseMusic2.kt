@@ -43,7 +43,8 @@ class NeteaseMusic2 {
         val album = getAlbum()
         val artists = getArtists()
 
-        val saveMusic = MusicRelatedBO(music)
+        val saveMusic = MusicRelatedBO()
+        saveMusic.music = music
         saveMusic.album = album
         saveMusic.artists = artists
 

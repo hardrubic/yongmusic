@@ -14,6 +14,9 @@
             android:id="@+id/nav_clear_cache"
             android:title="@string/clear_cache"/>
         <item
+            android:id="@+id/nav_check_update"
+            android:title="@string/check_update"/>
+        <item
             android:id="@+id/nav_about"
             android:title="@string/about"/>
         <item

@@ -95,7 +95,7 @@ class CommonMusicListFragment : BaseFragment() {
             musicResourceDownload.get().downloadMusicResource(mActivity, musicIds, object : MusicResourceListener {
                 override fun onSuccess(musicRelatedBOs: List<MusicRelatedBO>) {
                     viewModel.saveMusicRelated(musicRelatedBOs)
-                    val musics = musicRelatedBOs.map { it.music }
+                    val musics = musicRelatedBOs.map { it.music!! }
                     successCallback.invoke(MusicHelper.sortMusicByTargetId(musics, musicIds))
                     progressDialogFragment.dismiss()
                 }

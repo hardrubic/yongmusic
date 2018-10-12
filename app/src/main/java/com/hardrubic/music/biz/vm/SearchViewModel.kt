@@ -3,7 +3,7 @@ package com.hardrubic.music.biz.vm
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.MutableLiveData
-import com.hardrubic.music.biz.command.AddMusicsCommand
+import com.hardrubic.music.biz.command.list.AddMusicsCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
 import com.hardrubic.music.biz.repository.MusicRepository

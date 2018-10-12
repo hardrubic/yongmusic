@@ -87,7 +87,9 @@ class MusicResourceDownload(val httpService: HttpService) {
             for (index in 0 until musicIds.size) {
                 httpService.applyMusicDetail(musicIds[index], schedulers)
                         .subscribe(Consumer {
-                            musicRelatedBOs.add(it)
+                            if (it.music != null) {
+                                musicRelatedBOs.add(it)
+                            }
 
                             refreshProgress(ProgressWeight.MUSIC_DETAIL.toFloat())
                             countDownLatch.countDown()
@@ -171,9 +173,9 @@ class MusicResourceDownload(val httpService: HttpService) {
 
     private fun fillResourcePath2Music(relatedBOs: List<MusicRelatedBO>, resourceBOs: List<MusicResourceBO>) {
         for (relatedBO in relatedBOs) {
-            val bo = resourceBOs.find { it.musicId == relatedBO.music.musicId } ?: continue
-
-            relatedBO.music.path = bo.getPath()
+            val music = relatedBO.music!!
+            val bo = resourceBOs.find { it.musicId == music.musicId } ?: continue
+            music.path = bo.getPath()
         }
     }
 

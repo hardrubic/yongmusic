@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
+import com.hardrubic.music.biz.AppVersionUpdate
 import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayListHelper
@@ -40,6 +41,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         initMusicService()
         initToolBarAndDrawerLayout()
         applyPermission()
+
+        AppVersionUpdate.registerCheckUpdate(this, true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        AppVersionUpdate.unregisterCheckUpdate()
     }
 
     private fun initMusicService() {
@@ -111,6 +119,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             R.id.nav_about -> {
                 Toast.makeText(this, "敬请期待", Toast.LENGTH_LONG).show()
+            }
+            R.id.nav_check_update -> {
+                AppVersionUpdate.registerCheckUpdate(this, false)
             }
             R.id.nav_exit -> {
                 stopService(Intent(this, MusicService::class.java))

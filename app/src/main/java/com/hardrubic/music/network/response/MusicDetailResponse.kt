@@ -7,7 +7,8 @@ class MusicDetailResponse : BaseResponse() {
     var songs: List<NeteaseMusic2>? = null
 
     fun getMusicRelated(): MusicRelatedBO {
-        return songs?.first()?.getMusic()!!
+        //获取失败返回空BO
+        return songs?.first()?.getMusic() ?: MusicRelatedBO()
     }
 }
 

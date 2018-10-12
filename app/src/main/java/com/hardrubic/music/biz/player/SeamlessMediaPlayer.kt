@@ -201,7 +201,11 @@ class SeamlessMediaPlayer {
     }
 
     fun updateMusics(musics: List<MusicAidl>) {
-        MusicService.debugMusic("更新播放列表[${musics.joinToString(separator = ",") { it.name }}]")
+        if (musics.isEmpty()) {
+            MusicService.debugMusic("清空播放列表")
+        } else {
+            MusicService.debugMusic("更新播放列表[${musics.joinToString(separator = ",") { it.name }}]")
+        }
         musicDispatch.musics = musics
     }
 }
