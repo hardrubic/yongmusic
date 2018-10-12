@@ -102,3 +102,8 @@
   **[] $VALUES;
   public *;
 }
+
+#--- pgy ---
+-dontwarn com.pgyersdk.**
+-keep class com.pgyersdk.** { *; }
+-keep class com.pgyersdk.**$* { *; }

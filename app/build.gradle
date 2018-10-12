@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'org.greenrobot.greendao'
+apply plugin: 'AndResGuard'
 
 greendao {
     schemaVersion 1
@@ -15,8 +16,8 @@ android {
         applicationId "com.hardrubic.music"
         minSdkVersion 23
         targetSdkVersion 27
-        versionCode 2
-        versionName "1.1"
+        versionCode 4
+        versionName "1.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         externalNativeBuild {
@@ -43,6 +44,7 @@ android {
             zipAlignEnabled false
             shrinkResources false
             minifyEnabled false
+            applicationIdSuffix ".debug"
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
@@ -68,19 +70,33 @@ android {
             path "CMakeLists.txt"
         }
     }
+
+    //release apk重命名
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName =
+                    "yongmusic_" + "${variant.buildType.name}_${defaultConfig.versionName}_${getPackageTime()}.apk"
+        }
+    }
+}
+
+def getPackageTime() {
+    return new Date().format("yyyyMMdd-HHmm", TimeZone.getTimeZone("ETC/GMT-8"))
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation "android.arch.lifecycle:extensions:1.1.1"  // ViewModel and LiveData
+    implementation 'android.arch.lifecycle:extensions:1.1.1'// ViewModel and LiveData
+
+    //db
     implementation 'org.greenrobot:greendao:3.2.2'
 
+    //rx && network
     implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
@@ -93,17 +109,59 @@ dependencies {
     implementation 'zlc.season:rxdownload3:1.2.5'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 
+    //ui
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     compile 'com.youth.banner:banner:1.4.10'
 
+    //dagger
     implementation 'com.google.dagger:dagger:2.17'
     kapt 'com.google.dagger:dagger-compiler:2.17'
-    implementation "com.google.dagger:dagger-android:2.17"
-    implementation "com.google.dagger:dagger-android-support:2.17"
+    implementation 'com.google.dagger:dagger-android:2.17'
+    implementation 'com.google.dagger:dagger-android-support:2.17'
     kapt "com.google.dagger:dagger-android-processor:2.17"
+
+    //leakcanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
+    // Optional, if you use support library fragments:
+    debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
+
+    //other
+    compile 'com.pgyersdk:sdk:3.0.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+
+andResGuard {
+    // mappingFile = file("./resource_mapping.txt")
+    mappingFile = null
+    use7zip = true
+    useSign = true
+    // 打开这个开关，会keep住所有资源的原始路径，只混淆资源的名字
+    keepRoot = false
+    whiteList = [
+            // for your icon
+            "R.drawable.icon",
+            // for google-services
+            "R.string.google_app_id",
+            "R.string.gcm_defaultSenderId",
+            "R.string.default_web_client_id",
+            "R.string.ga_trackingId",
+            "R.string.firebase_database_url",
+            "R.string.google_api_key",
+            "R.string.google_crash_reporting_api_key"
+    ]
+    compressFilePattern = [
+            "*.png",
+            "*.jpg",
+            "*.jpeg",
+            "*.gif",
+    ]
+    sevenzip {
+        artifact = 'com.tencent.mm:SevenZip:1.2.15'
+        //path = "/usr/local/bin/7za"
+    }
 }
