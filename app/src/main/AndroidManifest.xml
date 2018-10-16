@@ -14,6 +14,11 @@
     <uses-permission android:name="android.permission.READ_PROFILE"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
+    <!-- remote service permission-->
+    <permission android:name="${applicationId}.permission.yongmusic"/>
+    <uses-permission android:name="${applicationId}.permission.yongmusic"/>
+
+
     <application
         android:name=".application.AppApplication"
         android:allowBackup="true"
@@ -42,7 +47,8 @@
 
         <service
             android:name=".service.MusicService"
-            android:process=":remote"/>
+            android:process=":remote"
+            android:exported="false"/>
 
         <provider
             android:name="com.pgyersdk.PgyerProvider"

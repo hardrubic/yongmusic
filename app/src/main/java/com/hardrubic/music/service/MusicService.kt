@@ -111,7 +111,7 @@ class MusicService : Service() {
         if (mediaPlayer.isPlaying()) {
             val intent = Intent(Constant.BroadcastAction.PROGRESS)
             intent.putExtra(Constant.Param.PROGRESS, mediaPlayer.position())
-            sendBroadcast(intent)
+            sendBroadcastWithPermission(intent)
         }
     }
 
@@ -119,14 +119,22 @@ class MusicService : Service() {
         val intent = Intent(Constant.BroadcastAction.CURRENT_MUSIC)
         intent.putExtra(Constant.Param.CURRENT_MUSIC, music)
 
-        sendBroadcast(intent)
+        sendBroadcastWithPermission(intent)
     }
 
     private fun sendPlayState(flag: Boolean) {
         val intent = Intent(Constant.BroadcastAction.PLAY_STATE)
         intent.putExtra(Constant.Param.FLAG, flag)
 
-        sendBroadcast(intent)
+        sendBroadcastWithPermission(intent)
+    }
+
+    /**
+     * 限制广播发送范围
+     */
+    private fun sendBroadcastWithPermission(intent: Intent) {
+        val permission = "$packageName.permission.${Constant.APP_NAME}"
+        sendBroadcast(intent, permission)
     }
 
     private inner class MusicManagerImpl : MusicManager.Stub() {

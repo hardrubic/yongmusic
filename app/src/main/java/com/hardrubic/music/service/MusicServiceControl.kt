@@ -39,7 +39,9 @@ class MusicServiceControl {
                 addAction(Constant.BroadcastAction.CURRENT_MUSIC)
                 addAction(Constant.BroadcastAction.PLAY_STATE)
             }
-            context.registerReceiver(musicBroadcastReceiver, intentFilter)
+
+            val permission = "${context.packageName}.permission.${Constant.APP_NAME}"
+            context.registerReceiver(musicBroadcastReceiver, intentFilter, permission, null)
         }
     }
 
