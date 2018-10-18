@@ -11,6 +11,9 @@ object MusicEntityAdapter {
             this.name = music.name
             this.path = music.path
             this.duration = music.duration
+            this.artistNames = music.artistNames.joinToString(separator = ",")
+            this.albumName = music.albumName
+            this.coverUrl = music.album.picUrl
         }
     }
 

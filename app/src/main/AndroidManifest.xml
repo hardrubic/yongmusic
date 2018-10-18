@@ -37,7 +37,8 @@
         <activity android:name=".ui.activity.MainActivity"/>
         <activity android:name=".ui.activity.SearchActivity"/>
         <activity android:name=".ui.activity.LocalMusicActivity"/>
-        <activity android:name=".ui.activity.PlayingActivity"/>
+        <activity android:name=".ui.activity.PlayingActivity"
+            android:launchMode="singleInstance"/>
         <activity android:name=".ui.activity.RecentActivity"/>
         <activity android:name=".ui.activity.CollectionDetailActivity"/>
         <activity android:name=".ui.activity.SelectCollectionActivity"/>
@@ -56,7 +57,7 @@
             android:exported="false"/>
         <meta-data
             android:name="PGYER_APPID"
-            android:value="9abe4e28e4910e21e8e6ad0f5c374019" >
+            android:value="9abe4e28e4910e21e8e6ad0f5c374019">
         </meta-data>
 
     </application>

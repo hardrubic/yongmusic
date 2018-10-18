@@ -10,6 +10,9 @@ public class MusicAidl implements Parcelable {
     private String path;
     private Integer duration;
     private Integer size;
+    private String artistNames;
+    private String albumName;
+    private String coverUrl;
 
     public Long getMusicId() {
         return musicId;
@@ -51,6 +54,30 @@ public class MusicAidl implements Parcelable {
         this.size = size;
     }
 
+    public String getArtistNames() {
+        return artistNames;
+    }
+
+    public void setArtistNames(String artistNames) {
+        this.artistNames = artistNames;
+    }
+
+    public String getAlbumName() {
+        return albumName;
+    }
+
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
+    }
+
+    public String getCoverUrl() {
+        return coverUrl;
+    }
+
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -63,6 +90,9 @@ public class MusicAidl implements Parcelable {
         dest.writeString(this.path);
         dest.writeValue(this.duration);
         dest.writeValue(this.size);
+        dest.writeString(this.artistNames);
+        dest.writeString(this.albumName);
+        dest.writeString(this.coverUrl);
     }
 
     public MusicAidl() {
@@ -74,6 +104,9 @@ public class MusicAidl implements Parcelable {
         this.path = in.readString();
         this.duration = (Integer) in.readValue(Integer.class.getClassLoader());
         this.size = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.artistNames = in.readString();
+        this.albumName = in.readString();
+        this.coverUrl = in.readString();
     }
 
     public static final Creator<MusicAidl> CREATOR = new Creator<MusicAidl>() {

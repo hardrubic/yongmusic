@@ -63,7 +63,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
         }
 
-        val playList: List<MusicAidl> = PlayListHelper.list().mapNotNull { viewModel.queryMusic(it) }.map { MusicEntityAdapter.toMusicAidl(it) }
+        val playList: List<MusicAidl> = PlayListHelper.list()
+                .asSequence()
+                .mapNotNull { viewModel.queryMusic(it) }
+                .map {
+                    MusicEntityAdapter.toMusicAidl(it)
+                }
+                .toList()
         if (playList.isNotEmpty()) {
             intent.putParcelableArrayListExtra(Constant.Param.LIST, ArrayList<MusicAidl>(playList))
         }

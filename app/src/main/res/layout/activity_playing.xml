@@ -110,7 +110,7 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:padding="10dp"
-            android:src="@mipmap/ic_pre_play"/>
+            android:src="@mipmap/ic_pre_play_white"/>
 
         <ImageView
             android:id="@+id/iv_play"
@@ -126,7 +126,7 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:padding="10dp"
-            android:src="@mipmap/ic_next_play"/>
+            android:src="@mipmap/ic_next_play_white"/>
 
         <ImageView
             android:id="@+id/iv_list"

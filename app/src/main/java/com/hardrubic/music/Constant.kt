@@ -33,6 +33,9 @@ class Constant {
         const val PROGRESS = "com.hardrubic.music.PROGRESS"
         const val CURRENT_MUSIC = "com.hardrubic.music.CURRENT_MUSIC"
         const val PLAY_STATE = "com.hardrubic.music.PLAY_STATE"
+        const val PLAY_OR_PAUSE = "com.hardrubic.music.PLAY_OR_PAUSE"
+        const val PLAY_PRE = "com.hardrubic.music.PLAY_PRE"
+        const val PLAY_NEXT = "com.hardrubic.music.PLAY_NEXT"
     }
 
     object SpKey {
@@ -53,9 +56,14 @@ class Constant {
         const val SINGLE = 2
     }
 
-    object ItemType {
-        const val MUSIC = 0
-        const val ARTIST = 1
-        const val ALBUM = 2
+    object NotificationChannel {
+        const val MUSIC = "music_channel"
+    }
+
+    object PendingRequestCode {
+        const val OPEN_PLAYING = 1
+        const val PLAY_OR_PAUSE = 2
+        const val PLAY_PRE = 3
+        const val PLAY_NEXT = 4
     }
 }
