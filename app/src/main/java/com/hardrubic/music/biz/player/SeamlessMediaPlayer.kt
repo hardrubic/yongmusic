@@ -156,6 +156,14 @@ class SeamlessMediaPlayer {
         return false
     }
 
+    fun playOrPause() {
+        if (isPlaying()) {
+            currentMediaPlayer.pause()
+        } else {
+            currentMediaPlayer.start()
+        }
+    }
+
     fun stop() {
         this.currentMediaPlayer.stop()
     }

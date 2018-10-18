@@ -2,8 +2,8 @@ package com.hardrubic.music.biz.vm
 
 import android.arch.lifecycle.ViewModel
 import com.hardrubic.music.Constant
-import com.hardrubic.music.biz.command.NextCommand
-import com.hardrubic.music.biz.command.PreviousCommand
+import com.hardrubic.music.biz.command.playstate.NextCommand
+import com.hardrubic.music.biz.command.playstate.PreviousCommand
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.repository.CollectionRepository
 import com.hardrubic.music.biz.repository.MusicRepository

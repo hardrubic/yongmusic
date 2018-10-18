@@ -79,6 +79,14 @@ class MusicServiceControl {
         }
     }
 
+    fun applyPlayOrPause() {
+        try {
+            musicManager?.play()
+        } catch (e: RemoteException) {
+            e.printStackTrace()
+        }
+    }
+
     fun applyPlay() {
         try {
             musicManager?.play()

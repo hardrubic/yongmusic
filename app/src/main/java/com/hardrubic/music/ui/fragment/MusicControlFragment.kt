@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.hardrubic.music.R
-import com.hardrubic.music.biz.command.*
+import com.hardrubic.music.biz.command.ApplyCurrentMusicCommand
+import com.hardrubic.music.biz.command.ApplyPlayStateCommand
+import com.hardrubic.music.biz.command.RemoteControl
+import com.hardrubic.music.biz.command.playstate.PlayOrPauseCommand
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.vm.MusicControlViewModel
 import com.hardrubic.music.db.dataobject.Music
@@ -57,11 +60,7 @@ class MusicControlFragment : BaseFragment() {
             }
         }
         iv_play.setOnClickListener {
-            if (musicServiceControl.isPlaying()) {
-                RemoteControl.executeCommand(PauseCommand(musicServiceControl))
-            } else {
-                RemoteControl.executeCommand(PlayCommand(musicServiceControl))
-            }
+            RemoteControl.executeCommand(PlayOrPauseCommand(musicServiceControl))
         }
         iv_list.setOnClickListener {
             val fragment = PlayListFragment()

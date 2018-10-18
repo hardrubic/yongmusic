@@ -7,9 +7,9 @@ import android.text.TextUtils
 import com.hardrubic.music.Constant
 import com.hardrubic.music.biz.command.RemoteControl
 import com.hardrubic.music.biz.command.SelectAndPlayCommand
-import com.hardrubic.music.biz.command.StopCommand
 import com.hardrubic.music.biz.command.list.DeleteAllMusicsCommand
 import com.hardrubic.music.biz.command.list.DeleteMusicCommand
+import com.hardrubic.music.biz.command.playstate.StopCommand
 import com.hardrubic.music.biz.helper.MusicHelper
 import com.hardrubic.music.biz.repository.MusicRepository
 import com.hardrubic.music.biz.repository.RecentRepository
