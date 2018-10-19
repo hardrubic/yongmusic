@@ -114,6 +114,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.nav_record_audio -> {
+                startRecordAudioActivity()
+            }
             R.id.nav_schedule_close -> {
                 Toast.makeText(this, "敬请期待", Toast.LENGTH_LONG).show()
             }
@@ -147,6 +150,17 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     if (granted) {
                     } else {
                         showNeedPermissionDialog()
+                    }
+                }
+    }
+
+    private fun startRecordAudioActivity() {
+        val rxPermissions = RxPermissions(this)
+        rxPermissions.request(Manifest.permission.RECORD_AUDIO)
+                .subscribe { granted ->
+                    if (granted) {
+                        val intent = Intent(this, RecordAudioActivity::class.java)
+                        startActivity(intent)
                     }
                 }
     }

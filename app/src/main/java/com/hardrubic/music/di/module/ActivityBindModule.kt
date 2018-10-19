@@ -51,4 +51,8 @@ abstract class ActivityBindModule {
     @ActivityScope
     @ContributesAndroidInjector(modules = [MusicControlModule::class])
     abstract fun contributeSelectCollectionActivity(): SelectCollectionActivity
+
+    @ActivityScope
+    @ContributesAndroidInjector(modules = [MusicControlModule::class])
+    abstract fun contributeRecordAudioActivity(): RecordAudioActivity
 }

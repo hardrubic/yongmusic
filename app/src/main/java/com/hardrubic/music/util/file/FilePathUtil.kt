@@ -11,6 +11,25 @@ object FilePathUtil {
     }
 
     fun getMusicCacheDir(context: Context): String {
-        return getAppDir(context) + "cache" + File.separator
+        val dir = "${getAppDir(context)}cache${File.separator}"
+        createDir(dir)
+        return dir
+    }
+
+    fun getRecordAudioDir(context: Context): String {
+        val dir = "${getAppDir(context)}record${File.separator}"
+        createDir(dir)
+        return dir
+    }
+
+    fun getRecordAudioTmpFile(context: Context): String {
+        return "${getRecordAudioDir(context)}tmpRecord.tmp"
+    }
+
+    private fun createDir(dir: String) {
+        val fileDir = File(dir)
+        if (!fileDir.exists()) {
+            fileDir.mkdirs()
+        }
     }
 }

@@ -77,8 +77,10 @@ android {
     //release apk重命名
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName =
-                    "yongmusic_" + "${variant.buildType.name}_${defaultConfig.versionName}_${getPackageTime()}.apk"
+            if (variant.buildType.name.toLowerCase().contains("release")) {
+                outputFileName =
+                        "yongmusic_" + "${variant.buildType.name}_${defaultConfig.versionName}_${getPackageTime()}.apk"
+            }
         }
     }
 }
@@ -88,6 +90,8 @@ def getPackageTime() {
 }
 
 dependencies {
+    implementation project(':RecordAudioSDK')
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
