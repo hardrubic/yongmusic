@@ -23,8 +23,8 @@ Java_com_hardrubic_music_biz_encrypt_EncryptParamBuilder_aesEncrypt(JNIEnv *env,
     size_t inlen = strlen(in);
     LOGD("param(%s %s %s %d)", in, key, iv, inlen);
 
-    char out[128];
-    memset((char *) out, 0, 128);
+    char out[256];
+    memset((char *) out, 0, 256);
     int len = 0;
     int outlen = 0;
 

@@ -26,6 +26,7 @@
     <string name="music">歌曲</string>
     <string name="introduction">介绍</string>
     <string name="record_audio">录音</string>
+    <string name="import_from">导入</string>
 
     <string name="num_with_bracket">(%1$d)</string>
     <string name="name_with_bracket">(%1$s)</string>

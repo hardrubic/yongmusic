@@ -1,5 +1,6 @@
 package com.hardrubic.music.ui.activity
 
+import android.app.Activity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.text.TextUtils
@@ -72,6 +73,7 @@ class LoginActivity : BaseActivity() {
                     val loginId = it.account!!.id
                     val loginName = it.profile!!.nickname
                     LoginInfo.updateUser(loginId, loginName)
+                    setResult(Activity.RESULT_OK)
                     finish()
                 }, Consumer {
                     Snackbar.make(btn_login_in, R.string.error_login_fail, Snackbar.LENGTH_SHORT).show()

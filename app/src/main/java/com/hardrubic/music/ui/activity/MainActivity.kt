@@ -1,6 +1,7 @@
 package com.hardrubic.music.ui.activity
 
 import android.Manifest
+import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.widget.Toast
 import com.hardrubic.music.Constant
 import com.hardrubic.music.R
 import com.hardrubic.music.biz.AppVersionUpdate
+import com.hardrubic.music.biz.LoginInfo
 import com.hardrubic.music.biz.adapter.MusicEntityAdapter
 import com.hardrubic.music.biz.helper.CurrentPlayingHelper
 import com.hardrubic.music.biz.helper.PlayListHelper
@@ -117,6 +119,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             R.id.nav_record_audio -> {
                 startRecordAudioActivity()
             }
+            R.id.nav_import_from -> {
+                if (LoginInfo.isLogin) {
+                    viewModel.importFrom()
+                    Toast.makeText(this, "导入成功1", Toast.LENGTH_LONG).show()
+                } else {
+                    startActivityForResult(Intent(this, LoginActivity::class.java), Constant.RequestCode.LOGIN_IN)
+                }
+            }
             R.id.nav_schedule_close -> {
                 Toast.makeText(this, "敬请期待", Toast.LENGTH_LONG).show()
             }
@@ -174,6 +184,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             dialog.dismiss()
             android.os.Process.killProcess(android.os.Process.myPid())
             System.exit(0)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            Constant.RequestCode.LOGIN_IN -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    viewModel.importFrom()
+                    Toast.makeText(this, "导入成功2", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }

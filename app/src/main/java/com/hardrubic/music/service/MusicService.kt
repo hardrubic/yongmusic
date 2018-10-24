@@ -67,19 +67,19 @@ class MusicService : Service() {
         registerNotifBroadcastReceiver()
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         debugInner("service onStartCommand")
 
         //初始化默认参数
-        val playModel = intent.getIntExtra(Constant.Param.PLAY_MODEL, Constant.PlayModel.LIST)
+        val playModel = intent?.getIntExtra(Constant.Param.PLAY_MODEL, Constant.PlayModel.LIST)!!
         internalUpdatePlayModel(playModel)
 
-        val musics: List<MusicAidl>? = intent.getParcelableArrayListExtra(Constant.Param.LIST)
+        val musics: List<MusicAidl>? = intent?.getParcelableArrayListExtra(Constant.Param.LIST)
         if (musics != null && musics.isNotEmpty()) {
             mediaPlayer.updateMusics(musics)
         }
 
-        val playingMusic = intent.getParcelableExtra<MusicAidl>(Constant.Param.CURRENT_MUSIC)
+        val playingMusic = intent?.getParcelableExtra<MusicAidl>(Constant.Param.CURRENT_MUSIC)
         if (playingMusic != null) {
             mediaPlayer.select(playingMusic)
             //TODO

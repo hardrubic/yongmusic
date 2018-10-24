@@ -45,4 +45,8 @@ class MainViewModel @Inject constructor(application: Application, val musicRepos
     fun addCollection(name: String, id: Long? = null) {
         collectionRepository.addCollection(name, id)
     }
+
+    fun importFrom(){
+
+    }
 }
