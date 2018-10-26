@@ -7,8 +7,11 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        ndk {
-            moduleName "mp3lame"
+        externalNativeBuild {
+            cmake {
+                abiFilters 'x86','armeabi-v7a'
+                cFlags "-DSTDC_HEADERS"
+            }
         }
     }
 
@@ -25,10 +28,15 @@ android {
             jni.srcDirs = ['libs']
         }
     }
+
+    externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
 }

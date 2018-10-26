@@ -1,4 +1,4 @@
-#include "libmp3lame-3.100/include/lame.h"
+#include "mp3lame-3.99.5/include/lame.h"
 #include "com_hardrubic_sdk_recordaudio_record_LameUtil.h"
 #include <stdio.h>
 #include <jni.h>
