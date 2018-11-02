@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class EncryptParamBuilder {
     static {
-        System.loadLibrary("libencrypt");
+        System.loadLibrary("encrypt");
     }
 
     public static HashMap<String, String> encrypt(HashMap<String,String> param) {
