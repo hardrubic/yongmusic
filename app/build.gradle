@@ -16,8 +16,8 @@ android {
         applicationId "com.hardrubic.music"
         minSdkVersion 23
         targetSdkVersion 27
-        versionCode 4
-        versionName "1.2.1"
+        versionCode 5
+        versionName "1.2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         externalNativeBuild {
