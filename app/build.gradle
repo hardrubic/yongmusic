@@ -65,8 +65,8 @@ android {
             assets.srcDirs = ['src/main/assets']
         }
 
-        //debug.setRoot('build-types/debug')
-        //release.setRoot('build-types/release')
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
     }
     externalNativeBuild {
         cmake {
