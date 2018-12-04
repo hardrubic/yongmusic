@@ -23,4 +23,9 @@
         <item name="android:layout_height">54dp</item>
     </style>
 
+    <style name="AppTheme.Translucent" parent="AppTheme.Base">
+        <item name="android:windowBackground">@color/translucence</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
 </resources>

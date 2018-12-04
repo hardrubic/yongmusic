@@ -14,7 +14,6 @@ import com.hardrubic.music.biz.vm.SearchViewModel
 import com.hardrubic.music.ui.activity.ArtistDetailActivity
 import com.hardrubic.music.ui.adapter.ArtistListAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
-import com.hardrubic.music.util.LoadingDialogUtil
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
 
@@ -52,19 +51,25 @@ class SearchArtistListFragment : BaseFragment(), Searchable {
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
         rv_list.addItemDecoration(DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL))
+
+        swipe_refresh_layout.setOnRefreshListener {
+            search(currentSearchText)
+        }
     }
 
     private fun initData() {
         viewModel.artistData.observe(this, android.arch.lifecycle.Observer {
             adapter.setNewData(it)
-            LoadingDialogUtil.getInstance().dismissLoadingDialog()
+            swipe_refresh_layout.isRefreshing = false
         })
         viewModel.searchMoreEnd.observe(this, android.arch.lifecycle.Observer {
+            swipe_refresh_layout.isRefreshing = false
             adapter.loadMoreEnd()
         })
     }
 
     override fun search(text: String) {
+        swipe_refresh_layout.isRefreshing = true
         currentSearchText = text
         viewModel.searchArtist(text, SearchErrorAction(mActivity))
     }

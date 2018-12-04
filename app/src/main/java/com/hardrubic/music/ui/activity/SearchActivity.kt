@@ -1,8 +1,14 @@
 package com.hardrubic.music.ui.activity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.view.KeyEvent
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.Toolbar
 import com.hardrubic.music.R
@@ -12,13 +18,14 @@ import com.hardrubic.music.ui.fragment.search.SearchAlbumListFragment
 import com.hardrubic.music.ui.fragment.search.SearchArtistListFragment
 import com.hardrubic.music.ui.fragment.search.SearchMusicListFragment
 import com.hardrubic.music.ui.widget.edittext.ClearableEditText
-import com.hardrubic.music.util.LoadingDialogUtil
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_search.*
 import java.util.concurrent.TimeUnit
 
 class SearchActivity : BaseActivity() {
+
+    private val ANIMATOR_DURATION = 500L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +40,7 @@ class SearchActivity : BaseActivity() {
         val searchView = ClearableEditText(this).apply {
             this.hint = getString(R.string.search)
             this.imeOptions = EditorInfo.IME_ACTION_SEARCH
-            this.inputType = EditorInfo.TYPE_CLASS_TEXT;
+            this.inputType = EditorInfo.TYPE_CLASS_TEXT
             this.setOnEditorActionListener { textVIew, actionId, event ->
                 event != null && event.keyCode == KeyEvent.KEYCODE_ENTER
             }
@@ -58,7 +65,6 @@ class SearchActivity : BaseActivity() {
             }
 
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                LoadingDialogUtil.getInstance().showProgressDialog(this@SearchActivity)
                 applySearch(searchView.text.trim().toString())
             }
         })
@@ -69,11 +75,80 @@ class SearchActivity : BaseActivity() {
                 .subscribe {
                     applySearch(it)
                 }
+
+        searchView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                searchView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                performEnterAnimation()
+            }
+        })
+    }
+
+    /**
+     * 计算搜索栏在上一个页面的位置
+     */
+    private fun searchViewOriginalY(): Float {
+        /*
+        val originalScreenY = intent.getFloatExtra(SEARCH_VIEW_Y, et_text.y)
+
+        val tv = TypedValue()
+        this.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)
+        val actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+        val statusBarHeight = ScreenUtils.getStatusBarHeight(this)
+        return originalScreenY - statusBarHeight - actionBarHeight
+        */
+        return 0F
+    }
+
+    private fun performEnterAnimation() {
+        val alphaAnimator = buildAlphaAnimator(0F, 1F)
+        alphaAnimator.start()
+    }
+
+    private fun performExitAnimation() {
+        val alphaAnimator = buildAlphaAnimator(1F, 0F)
+        alphaAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                finish()
+                overridePendingTransition(0, 0)
+            }
+        })
+
+        alphaAnimator.start()
+    }
+
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        performExitAnimation()
+    }
+
+    private fun buildAlphaAnimator(from: Float, to: Float): ValueAnimator {
+        val animator = ValueAnimator.ofFloat(from, to)
+        animator.addUpdateListener {
+            val value = it.animatedValue as Float
+            window.decorView.alpha = value
+        }
+        animator.duration = ANIMATOR_DURATION
+        return animator
     }
 
     private fun applySearch(text: String) {
+        if (text.isEmpty()) {
+            return
+        }
+
         val position = vp_list.currentItem
         val fragment = (vp_list.adapter as MyViewPagerAdapter).getItem(position)
         (fragment as? Searchable)?.search(text)
+    }
+
+    companion object {
+        val SEARCH_VIEW_Y = "SEARCH_VIEW_Y"
+
+        fun start(activity: Activity, searchViewY: Int) {
+            val intent = Intent(activity, SearchActivity::class.java)
+            intent.putExtra(SEARCH_VIEW_Y, searchViewY)
+            activity.startActivity(intent)
+        }
     }
 }

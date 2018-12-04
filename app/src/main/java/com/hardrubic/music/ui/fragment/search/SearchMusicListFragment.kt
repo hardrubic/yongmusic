@@ -19,7 +19,6 @@ import com.hardrubic.music.entity.vo.MusicVO
 import com.hardrubic.music.ui.adapter.show.ShowMusicAdapter
 import com.hardrubic.music.ui.fragment.BaseFragment
 import com.hardrubic.music.ui.fragment.ProgressDialogFragment
-import com.hardrubic.music.util.LoadingDialogUtil
 import dagger.Lazy
 import kotlinx.android.synthetic.main.fragment_search_result_list.*
 import java.util.*
@@ -61,15 +60,20 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
         rv_list.layoutManager = LinearLayoutManager(activity)
         rv_list.adapter = adapter
         rv_list.addItemDecoration(DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL))
+
+        swipe_refresh_layout.setOnRefreshListener {
+            search(currentSearchText)
+        }
     }
 
     private fun initData() {
         viewModel.musicData.observe(this, android.arch.lifecycle.Observer {
             adapter.setNewData(it)
-            LoadingDialogUtil.getInstance().dismissLoadingDialog()
+            swipe_refresh_layout.isRefreshing = false
         })
         viewModel.searchMoreEnd.observe(this, android.arch.lifecycle.Observer {
             adapter.loadMoreEnd()
+            swipe_refresh_layout.isRefreshing = false
         })
     }
 
@@ -97,6 +101,7 @@ class SearchMusicListFragment : BaseFragment(), Searchable {
     }
 
     override fun search(text: String) {
+        swipe_refresh_layout.isRefreshing = true
         currentSearchText = text
         viewModel.searchMusic(text, SearchErrorAction(mActivity))
     }

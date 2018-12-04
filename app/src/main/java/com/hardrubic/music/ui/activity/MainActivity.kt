@@ -95,7 +95,11 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         nav_view.setNavigationItemSelectedListener(this)
 
         ll_search.setOnClickListener {
-            startActivity(Intent(this, SearchActivity::class.java))
+            val location = IntArray(2)
+            ll_search.getLocationOnScreen(location)
+            val searchViewY = location[1]
+            SearchActivity.start(this@MainActivity, searchViewY)
+            overridePendingTransition(0, 0)
         }
 
         val paperAdapter = MyViewPagerAdapter(supportFragmentManager)
