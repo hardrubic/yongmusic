@@ -3,12 +3,15 @@ package com.hardrubic.music.service
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.IBinder
+import android.os.*
 import android.provider.Settings
 import android.view.*
+import android.widget.TextView
+import com.hardrubic.music.Constant
 import com.hardrubic.music.R
+import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.ui.activity.MainActivity
+import com.hardrubic.music.ui.activity.PlayingActivity
 
 
 class OverlayService : Service() {
@@ -17,21 +20,30 @@ class OverlayService : Service() {
     private lateinit var windowManager: WindowManager
     private var overlayLayout: View? = null
     private var overlayLayoutParams: WindowManager.LayoutParams? = null
+    private lateinit var messenger: Messenger
+    private var playing = false
 
     override fun onCreate() {
         super.onCreate()
 
         customGestureDetector = GestureDetector(this, CustomSimpleGestureDetector())
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        messenger = Messenger(ReceiveMsgHandler())
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         showWindow()
+
+        val playingMusic = intent?.getParcelableExtra<MusicAidl>(Constant.Param.CURRENT_MUSIC)
+        if (playingMusic != null) {
+            updateShow(playingMusic.name)
+        }
+
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null
+        return messenger.binder
     }
 
     override fun onDestroy() {
@@ -63,12 +75,23 @@ class OverlayService : Service() {
         }
     }
 
+    private fun updateShow(name: String) {
+        val tv = overlayLayout?.findViewById<TextView>(R.id.tv_name)
+        if (name.isEmpty()) {
+            playing = false
+            tv?.text = getString(R.string.no_music)
+        } else {
+            playing = true
+            tv?.text = name
+        }
+    }
+
     private inner class OverlayTouchListener : View.OnTouchListener {
         private var lastTouchX = 0F
         private var lastTouchY = 0F
 
-        //拖动处理
         override fun onTouch(v: View, event: MotionEvent): Boolean {
+            //拖动处理
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastTouchX = event.rawX
@@ -91,14 +114,39 @@ class OverlayService : Service() {
     }
 
     private inner class CustomSimpleGestureDetector : GestureDetector.SimpleOnGestureListener() {
+        //TODO 回到应用进程显示
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-            startActivity(Intent(this@OverlayService, MainActivity::class.java))
+            if (playing) {
+                startActivity(Intent(this@OverlayService, PlayingActivity::class.java))
+            } else {
+                startActivity(Intent(this@OverlayService, MainActivity::class.java))
+            }
             return false
         }
 
         override fun onDoubleTap(e: MotionEvent?): Boolean {
             stopSelf()
             return false
+        }
+
+        override fun onLongPress(e: MotionEvent?) {
+            MusicServiceControl.runInMusicService(this@OverlayService) {
+                it.applyNext()
+            }
+        }
+    }
+
+    private inner class ReceiveMsgHandler : Handler() {
+        override fun handleMessage(fromMsg: Message) {
+
+            when (fromMsg.what) {
+                Constant.HandlerMsg.MUSIC_NAME -> {
+                    val name = fromMsg.obj as String
+                    updateShow(name)
+                }
+            }
+
+            super.handleMessage(fromMsg)
         }
     }
 }

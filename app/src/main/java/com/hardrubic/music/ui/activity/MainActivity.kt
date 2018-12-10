@@ -23,6 +23,8 @@ import com.hardrubic.music.biz.helper.PlayListHelper
 import com.hardrubic.music.biz.vm.MainViewModel
 import com.hardrubic.music.entity.aidl.MusicAidl
 import com.hardrubic.music.service.MusicService
+import com.hardrubic.music.service.OverlayService
+import com.hardrubic.music.service.ServiceHelper
 import com.hardrubic.music.ui.adapter.MyViewPagerAdapter
 import com.hardrubic.music.ui.fragment.DiscoverFragment
 import com.hardrubic.music.ui.fragment.MainListFragment
@@ -30,7 +32,6 @@ import com.hardrubic.music.util.PreferencesUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import com.hardrubic.music.service.OverlayService
 
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -57,13 +58,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     private fun initMusicService() {
-        val playingMusicId = CurrentPlayingHelper.getPlayingMusicId()
 
         val intent = Intent(this, MusicService::class.java)
         intent.putExtra(Constant.Param.PLAY_MODEL, PreferencesUtil.instance.getInt(Constant.SpKey.PLAY_MODEL))
 
-        if (playingMusicId != null) {
-            val playingMusic = viewModel.queryMusic(playingMusicId)
+        CurrentPlayingHelper.getPlayingMusicId()?.let {
+            val playingMusic = viewModel.queryMusic(it)
             if (playingMusic != null) {
                 intent.putExtra(Constant.Param.CURRENT_MUSIC, MusicEntityAdapter.toMusicAidl(playingMusic))
             }
@@ -85,8 +85,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private fun initOverlayService() {
         if (Settings.canDrawOverlays(this)) {
-            val intent = Intent(this, OverlayService::class.java)
-            startService(intent)
+            if (!ServiceHelper.isServiceWork(this, OverlayService::class.java.name)) {
+                val intent = Intent(this, OverlayService::class.java)
+                CurrentPlayingHelper.getPlayingMusicId()?.let {
+                    val playingMusic = viewModel.queryMusic(it)
+                    if (playingMusic != null) {
+                        intent.putExtra(Constant.Param.CURRENT_MUSIC, MusicEntityAdapter.toMusicAidl(playingMusic))
+                    }
+                }
+
+                startService(intent)
+            } else {
+                val intent = Intent(this, OverlayService::class.java)
+                stopService(intent)
+            }
         } else {
             val builder = AlertDialog.Builder(this)
             builder.setMessage(R.string.hint_get_overlay_permission)

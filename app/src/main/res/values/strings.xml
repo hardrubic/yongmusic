@@ -54,6 +54,7 @@
     <string name="version_update">版本更新</string>
     <string name="check_update">检查更新</string>
     <string name="overlay_window">悬浮窗</string>
+    <string name="no_music">没有音乐</string>
 
     <string name="hint_add_music_to_collection_success">成功添加音乐到:%1$s</string>
     <string name="hint_collection_name">请输入歌单标题</string>

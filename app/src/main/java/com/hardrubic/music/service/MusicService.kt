@@ -178,7 +178,7 @@ class MusicService : Service() {
         } else {
             //TODO 优化没有音乐时的展示
             remoteViews.setImageViewBitmap(R.id.iv_photo, BitmapFactory.decodeResource(resources, R.mipmap.ic_empty_cover))
-            remoteViews.setTextViewText(R.id.tv_name, "没有音乐呢")
+            remoteViews.setTextViewText(R.id.tv_name, getString(R.string.no_music))
         }
         return remoteViews
     }
@@ -230,6 +230,7 @@ class MusicService : Service() {
     private fun doMusicChange(playingMusic: MusicAidl) {
         changeMusicNotification()
         sendCurrentMusic(playingMusic)
+        OverlayServiceControl.changeMusicName(this, playingMusic.name)
     }
 
     private fun sendProgress() {

@@ -31,6 +31,10 @@ class Constant {
     object ResultCode {
     }
 
+    object HandlerMsg {
+        const val MUSIC_NAME = 100
+    }
+
     object BroadcastAction {
         const val PROGRESS = "com.hardrubic.music.PROGRESS"
         const val CURRENT_MUSIC = "com.hardrubic.music.CURRENT_MUSIC"
