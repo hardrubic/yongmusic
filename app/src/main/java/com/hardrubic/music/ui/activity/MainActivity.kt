@@ -4,7 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -28,6 +30,8 @@ import com.hardrubic.music.util.PreferencesUtil
 import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import com.hardrubic.music.service.OverlayService
+
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -77,6 +81,25 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
 
         startService(intent)
+    }
+
+    private fun initOverlayService() {
+        if (Settings.canDrawOverlays(this)) {
+            val intent = Intent(this, OverlayService::class.java)
+            startService(intent)
+        } else {
+            val builder = AlertDialog.Builder(this)
+            builder.setMessage(R.string.hint_get_overlay_permission)
+            builder.setPositiveButton(R.string.ok) { dialog, which ->
+                val action = Settings.ACTION_MANAGE_OVERLAY_PERMISSION
+                val uri = Uri.parse("package:$packageName")
+                startActivityForResult(Intent(action, uri), Constant.RequestCode.GET_OVERLAY_PERMISSION)
+            }
+            builder.setNegativeButton(R.string.cancel) { dialog, which ->
+                dialog.dismiss()
+            }
+            builder.show()
+        }
     }
 
     private fun initToolBarAndDrawerLayout() {
@@ -130,6 +153,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 } else {
                     startActivityForResult(Intent(this, LoginActivity::class.java), Constant.RequestCode.LOGIN_IN)
                 }
+            }
+            R.id.nav_overlay -> {
+                initOverlayService()
             }
             R.id.nav_schedule_close -> {
                 Toast.makeText(this, "敬请期待", Toast.LENGTH_LONG).show()
@@ -200,6 +226,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     viewModel.importFrom()
                     Toast.makeText(this, "导入成功2", Toast.LENGTH_LONG).show()
                 }
+            }
+            Constant.RequestCode.GET_OVERLAY_PERMISSION -> {
+                initOverlayService()
             }
         }
     }

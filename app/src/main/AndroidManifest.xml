@@ -10,11 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_PROFILE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <!-- remote service permission -->
     <permission android:name="${applicationId}.permission.yongmusic"/>
@@ -35,7 +31,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.MainActivity"/>
+        <activity android:name=".ui.activity.MainActivity"
+            android:launchMode="singleTask"/>
         <activity android:name=".ui.activity.SearchActivity"
             android:theme="@style/AppTheme.Translucent"/>
         <activity android:name=".ui.activity.LocalMusicActivity"/>
@@ -52,6 +49,11 @@
 
         <service
             android:name=".service.MusicService"
+            android:exported="false"
+            android:process=":remote"/>
+
+        <service
+            android:name=".service.OverlayService"
             android:exported="false"
             android:process=":remote"/>
 

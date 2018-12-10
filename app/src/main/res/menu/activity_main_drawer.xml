@@ -11,6 +11,9 @@
             android:id="@+id/nav_import_from"
             android:title="@string/import_from"/>
         <item
+            android:id="@+id/nav_overlay"
+            android:title="@string/overlay_window"/>
+        <item
             android:id="@+id/nav_schedule_close"
             android:title="@string/schedule_close"/>
         <item

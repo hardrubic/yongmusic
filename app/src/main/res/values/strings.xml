@@ -53,6 +53,7 @@
     <string name="view_album">查看专辑</string>
     <string name="version_update">版本更新</string>
     <string name="check_update">检查更新</string>
+    <string name="overlay_window">悬浮窗</string>
 
     <string name="hint_add_music_to_collection_success">成功添加音乐到:%1$s</string>
     <string name="hint_collection_name">请输入歌单标题</string>
@@ -61,6 +62,7 @@
     <string name="hint_music_invalid">歌曲不可用</string>
     <string name="hint_no_data">没有数据</string>
     <string name="hint_no_new_version">已经是最新版本</string>
+    <string name="hint_get_overlay_permission">需要获取悬浮窗权限</string>
 
     <!-- 登录 -->
     <string name="login_in">登录</string>

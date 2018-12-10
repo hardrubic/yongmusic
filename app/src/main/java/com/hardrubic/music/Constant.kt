@@ -25,6 +25,7 @@ class Constant {
     object RequestCode {
         const val SELECT_COLLECTION = 100
         const val LOGIN_IN = 101
+        const val GET_OVERLAY_PERMISSION = 102
     }
 
     object ResultCode {
