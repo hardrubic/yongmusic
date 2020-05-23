@@ -8,7 +8,6 @@ import com.hardrubic.music.BuildConfig
 import com.hardrubic.music.db.DbManager
 import com.hardrubic.music.di.component.DaggerAppComponent
 import com.hardrubic.music.util.PreferencesUtil
-import com.pgyersdk.crash.PgyCrashManager
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -32,8 +31,6 @@ class AppApplication : Application(), HasActivityInjector {
 
             LeakCanary.install(this)
         }
-
-        PgyCrashManager.register()
 
         PreferencesUtil.initializeInstance(this)
         DbManager.init(this)

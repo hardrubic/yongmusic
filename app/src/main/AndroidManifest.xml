@@ -57,15 +57,6 @@
             android:exported="false"
             android:process=":remote"/>
 
-        <provider
-            android:name="com.pgyersdk.PgyerProvider"
-            android:authorities="${applicationId}.com.pgyer.provider"
-            android:exported="false"/>
-
-        <meta-data
-            android:name="PGYER_APPID"
-            android:value="9abe4e28e4910e21e8e6ad0f5c374019">
-        </meta-data>
     </application>
 
 </manifest>

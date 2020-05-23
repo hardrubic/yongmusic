@@ -4,6 +4,8 @@ apply from: "config.gradle"
 buildscript {
     ext.kotlin_version = '1.2.70'
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        mavenCentral()
         google()
         jcenter()
     }
@@ -20,10 +22,10 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         google()
         jcenter()
         mavenCentral()
-        maven { url "https://raw.githubusercontent.com/Pgyer/mvn_repo_pgyer/master" }
     }
 }
 
