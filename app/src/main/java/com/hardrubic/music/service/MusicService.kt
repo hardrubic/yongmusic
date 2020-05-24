@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
+import android.text.TextUtils
 import android.widget.RemoteViews
 import com.hardrubic.music.Constant
 import com.hardrubic.music.MusicManager
@@ -164,7 +165,7 @@ class MusicService : Service() {
 
     private fun creteMusicNotification(music: MusicAidl?, playing: Boolean): RemoteViews {
         val remoteViews = RemoteViews(packageName, R.layout.layout_music_notification)
-        if (music != null) {
+        if (music != null && !TextUtils.isEmpty(music.coverUrl)) {
             val bitmap = LoadImageUtil.loadFromNetworkAsBitmap(this, music.coverUrl)
             remoteViews.setImageViewBitmap(R.id.iv_photo, bitmap)
             remoteViews.setTextViewText(R.id.tv_name, music.name)
